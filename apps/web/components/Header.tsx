@@ -11,7 +11,7 @@ import {
   useClerk,
   UserProfile,
 } from "@clerk/nextjs"
-import { LogOut, Settings, X, FileText } from "lucide-react"
+import { LogOut, Settings, X, FileText, LogIn } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -26,6 +26,7 @@ import { ShimmerButton } from "@/components/ui/shimmer-button"
 import { NavigationMenuLink } from "@/components/ui/navigation-menu"
 
 import { useIsMobile } from "@/hooks/use-media-query"
+import { useAuth } from "@/hooks/use-auth"
 import { cn } from "@/lib/utils"
 
 import { HeaderServer } from "./HeaderServer"
@@ -41,6 +42,7 @@ export function Header({ tagName, page }: { tagName?: string; page?: string }) {
   const inputRef = React.useRef<HTMLInputElement>(null)
   const isMobile = useIsMobile()
   const { user, signOut } = useClerk()
+  const { user: authUser, logout, isLoading } = useAuth()
   const [showUserProfile, setShowUserProfile] = useState(false)
 
   useEffect(() => {
@@ -93,6 +95,7 @@ export function Header({ tagName, page }: { tagName?: string; page?: string }) {
           <HeaderServer.SocialIcons />
           {!isMobile && (
             <>
+              {/* Clerk Auth */}
               <SignedIn>
                 {!isPublishPage && (
                   <Button asChild className="ml-2">
@@ -156,6 +159,54 @@ export function Header({ tagName, page }: { tagName?: string; page?: string }) {
                   <Button className="ml-2">Publish component</Button>
                 </SignInButton>
               </SignedOut>
+
+              {/* Custom Auth */}
+              {!isLoading && authUser && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="cursor-pointer rounded-full ml-2">
+                    <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-semibold">
+                      {authUser.first_name?.[0] || authUser.email?.[0] || 'U'}
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="max-w-64" align="end">
+                    <DropdownMenuLabel className="flex flex-col gap-1">
+                      <span className="text-sm font-medium text-foreground">
+                        {authUser.first_name && authUser.last_name
+                          ? `${authUser.first_name} ${authUser.last_name}`
+                          : authUser.email}
+                      </span>
+                      <span className="text-xs font-normal text-muted-foreground">
+                        {authUser.email}
+                      </span>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/app/dashboard">
+                        <span>Dashboard</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => logout()}>
+                      <LogOut className="w-4 h-4 mr-2 opacity-60" />
+                      <span>Sign out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
+              {!isLoading && !authUser && (
+                <div className="flex gap-2 ml-2">
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/login">
+                      <LogIn className="w-4 h-4 mr-2" />
+                      Sign In
+                    </Link>
+                  </Button>
+                  <Button asChild size="sm">
+                    <Link href="/signup">Sign Up</Link>
+                  </Button>
+                </div>
+              )}
             </>
           )}
         </div>
