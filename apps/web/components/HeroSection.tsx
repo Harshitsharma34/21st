@@ -59,26 +59,24 @@ export function HeroSection() {
           <div className="flex items-center gap-2 mb-10 md:mb-16 lg:mb-20">
             <div className="h-6 w-6 rounded-full bg-foreground" />
             <span className="text-lg font-semibold text-foreground">
-              21st.dev
+              ReMind
             </span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 md:mb-8 bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent leading-[1.2] pb-1">
-            The NPM for <br />
-            Design Engineers
+            The Memory of <br />
+            Your Project
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl leading-relaxed mb-8 md:mb-12 bg-gradient-to-b from-muted-foreground to-muted-foreground/70 bg-clip-text text-transparent">
-            Ship polished UIs faster with React Tailwind components inspired by
-            shadcn/ui.
+            Built from your meetings and the conversations around them.
             <br />
-            Built by design engineers, for design engineers. One command to
-            install.
+            See what you believe, how you got there, and what changed. Every claim backed by a quote.
           </p>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4">
             <Button size="lg" variant="default" onClick={onEnterWebsite}>
-              Browse components
+              Paste a Transcript
               {!isMobile && (
                 <kbd className="-me-1 ms-3 inline-flex h-5 max-h-full items-center rounded border border-muted-foreground/70 bg-muted-foreground/10 px-1.5 font-[inherit] text-[0.625rem] font-medium text-background/70">
                   ⏎
@@ -93,7 +91,7 @@ export function HeroSection() {
               asChild
             >
               <a
-                href="https://github.com/rorkai/21st"
+                href="https://github.com/remind-project"
                 target="_blank"
                 rel="noreferrer"
               >

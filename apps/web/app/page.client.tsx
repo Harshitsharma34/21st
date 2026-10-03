@@ -1,354 +1,263 @@
 "use client"
 
-import React, { useEffect, useState, useCallback } from "react"
-
-import { useAtom } from "jotai"
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { motion } from "framer-motion"
-import debounce from "lodash/debounce"
+import { CheckCircle2, Brain, GitBranch, Zap, Lock, MailOpen } from "lucide-react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
-import {
-  Component,
-  QuickFilterOption,
-  SortOption,
-  User,
-  ComponentWithUser,
-} from "@/types/global"
+const features = [
+  {
+    icon: Brain,
+    title: "Current State",
+    description: "See what your team believes right now. Every decision, requirement, and assumption backed by evidence.",
+  },
+  {
+    icon: GitBranch,
+    title: "How We Got Here",
+    description: "A timeline from start to now. See which decisions changed, what triggered the change, and why.",
+  },
+  {
+    icon: Zap,
+    title: "What Changed",
+    description: "In each meeting, ReMind flags what's different. Who might be working from old information.",
+  },
+  {
+    icon: MailOpen,
+    title: "External Context",
+    description: "Connect Jira, GitHub, Slack. See the related conversations happening outside meetings.",
+  },
+  {
+    icon: CheckCircle2,
+    title: "Evidence-Backed",
+    description: "Every claim has a direct quote from your transcript. No guessing, no unsourced claims.",
+  },
+  {
+    icon: Lock,
+    title: "Built for Privacy",
+    description: "Transcripts aren't stored. Only structured output. GDPR-aligned, SOC 2 controls, full audit trail.",
+  },
+]
 
-import { useClerkSupabaseClient } from "@/lib/clerk"
-import { setCookie } from "@/lib/cookies"
+const integrations = [
+  { name: "Google Meet", status: "Live", description: "Auto-join meetings and capture captions" },
+  { name: "Jira", status: "Live", description: "Link issues to decisions" },
+  { name: "GitHub", status: "Live", description: "Connect pull requests and issues" },
+  { name: "Slack", status: "Coming soon", description: "Link conversations and threads" },
+  { name: "Linear", status: "Coming soon", description: "Sync project updates" },
+]
 
-import {
-  ComponentCard,
-  ComponentCardSkeleton,
-} from "@/components/ComponentCard"
-import { searchQueryAtom } from "@/components/Header"
-import {
-  ComponentsHeader,
-  sortByAtom,
-  quickFilterAtom,
-} from "@/components/ComponentsHeader"
-import { Loader2 } from "lucide-react"
+const captureOptions = [
+  "Paste a transcript",
+  "Use the Chrome extension for Google Meet",
+  "Import Google Drive meeting notes",
+  "Record in the browser",
+  "Let the meeting bot join automatically",
+]
 
-const useTrackHasOnboarded = () => {
-  useEffect(() => {
-    setCookie({
-      name: "has_onboarded",
-      value: "true",
-      expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-      httpOnly: true,
-      sameSite: "lax",
-    })
-  }, [])
-}
-
-export function HomePageClient({
-  initialComponents,
-  initialSortBy,
-  initialQuickFilter,
-  componentsTotalCount,
-}: {
-  initialComponents: (Component & { user: User })[]
-  initialSortBy: SortOption
-  initialQuickFilter: QuickFilterOption
-  componentsTotalCount: number
-}) {
-  const [searchQuery] = useAtom(searchQueryAtom)
-  const supabase = useClerkSupabaseClient()
-  const [sortBy, setSortBy] = useAtom(sortByAtom)
-  const [quickFilter, setQuickFilter] = useAtom(quickFilterAtom)
-  const [isStorageLoaded, setIsStorageLoaded] = useState(false)
-  const [totalCount, setTotalCount] = useState<number>(0)
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery)
-  const [debouncedQuickFilter, setDebouncedQuickFilter] = useState(quickFilter)
-  const [tabCounts, setTabCounts] = useState<Record<QuickFilterOption, number>>(
-    {
-      all: initialComponents.length,
-      last_released: 0,
-      most_downloaded: 0,
-    },
-  )
-
-  // Initialize atoms from localStorage or use initial values
-  useEffect(() => {
-    const storedSortBy = localStorage.getItem("components-sort-by")
-    const storedQuickFilter = localStorage.getItem("quick-filter")
-
-    if (!storedSortBy) {
-      setSortBy(initialSortBy)
-    }
-    if (!storedQuickFilter) {
-      setQuickFilter(initialQuickFilter)
-    }
-    setIsStorageLoaded(true)
-  }, [])
-
-  const debouncedSetSearchQuery = useCallback(
-    debounce((value: string) => {
-      setDebouncedSearchQuery(value)
-    }, 300),
-    [],
-  )
-
-  const debouncedSetQuickFilter = useCallback(
-    debounce((value: QuickFilterOption) => {
-      setDebouncedQuickFilter(value)
-    }, 100),
-    [],
-  )
-
-  useEffect(() => {
-    if (isStorageLoaded) {
-      debouncedSetSearchQuery(searchQuery)
-    }
-    return () => {
-      debouncedSetSearchQuery.cancel()
-    }
-  }, [searchQuery, debouncedSetSearchQuery, isStorageLoaded])
-
-  useEffect(() => {
-    if (isStorageLoaded) {
-      debouncedSetQuickFilter(quickFilter)
-    }
-    return () => {
-      debouncedSetQuickFilter.cancel()
-    }
-  }, [quickFilter, debouncedSetQuickFilter, isStorageLoaded])
-
-  const { data, isLoading, isFetching, fetchNextPage, hasNextPage } =
-    useInfiniteQuery({
-      queryKey: [
-        "filtered-components",
-        debouncedQuickFilter,
-        sortBy,
-        debouncedSearchQuery,
-      ],
-      queryFn: async ({ pageParam = 0 }) => {
-        if (!debouncedSearchQuery) {
-          const { data: filteredData, error } = await supabase.rpc(
-            "get_filtered_components",
-            {
-              p_quick_filter: debouncedQuickFilter,
-              p_sort_by: sortBy,
-              p_offset: Number(pageParam) * 24,
-              p_limit: 24,
-            },
-          )
-
-          if (error) {
-            throw new Error(error.message || `HTTP error: ${status}`)
-          }
-
-          const data = filteredData || []
-          if (data.length === 0) {
-            return {
-              data: [],
-              total_count: 0,
-            }
-          }
-
-          const components = data.map((item) => ({
-            ...item,
-            user: item.user_data as User,
-            compiled_css: null,
-            fts: null,
-            global_css_extension: null,
-            hunter_username: null,
-            is_paid: false,
-            payment_url: null,
-            price: 0,
-            pro_preview_image_url: null,
-            website_url: null,
-            tailwind_config_extension: null,
-            video_url: item.video_url || null,
-          })) as ComponentWithUser[]
-
-          return {
-            data: components,
-            total_count: data[0]?.total_count ?? 0,
-          }
-        }
-
-        const { data: searchData, error } = await supabase.rpc(
-          "search_components",
-          {
-            search_query: debouncedSearchQuery,
-          },
-        )
-
-        if (error) {
-          throw new Error(error.message)
-        }
-
-        const searchResults = searchData || []
-        if (searchResults.length === 0) {
-          return {
-            data: [],
-            total_count: 0,
-          }
-        }
-
-        const components = searchResults.map((result) => {
-          const userData = result.user_data as Record<string, unknown>
-          return {
-            id: result.id,
-            component_names: result.component_names,
-            description: result.description,
-            code: result.code,
-            demo_code: result.demo_code,
-            created_at: result.created_at,
-            updated_at: result.updated_at,
-            user_id: result.user_id,
-            dependencies: result.dependencies,
-            is_public: result.is_public,
-            downloads_count: result.downloads_count || 0,
-            likes_count: result.likes_count,
-            component_slug: result.component_slug,
-            name: result.name,
-            demo_dependencies: result.demo_dependencies,
-            registry: result.registry,
-            direct_registry_dependencies: result.direct_registry_dependencies,
-            demo_direct_registry_dependencies:
-              result.demo_direct_registry_dependencies,
-            preview_url: result.preview_url,
-            license: result.license,
-            compiled_css: null,
-            global_css_extension: null,
-            hunter_username: null,
-            is_paid: false,
-            payment_url: null,
-            price: 0,
-            pro_preview_image_url: null,
-            video_url: result.video_url,
-            website_url: null,
-            user: userData as User,
-            fts: null,
-          }
-        }) as ComponentWithUser[]
-
-        return {
-          data: components,
-          total_count: components.length,
-        }
+export function HomePageClient() {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
       },
-      enabled: isStorageLoaded,
-      staleTime: 1000 * 60 * 5,
-      gcTime: 1000 * 60 * 30,
-      refetchOnWindowFocus: false,
-      retry: false,
-      initialPageParam: 0,
-      getNextPageParam: (lastPage, allPages) => {
-        if (!lastPage?.data || lastPage.data.length === 0) return undefined
-        const loadedCount = allPages.reduce(
-          (sum, page) => sum + page.data.length,
-          0,
-        )
-        return loadedCount < lastPage.total_count ? allPages.length : undefined
-      },
-    })
-
-  const allComponents = data?.pages.flatMap((page) => page.data)
-
-  const showSkeleton = isLoading || !data?.pages?.[0]?.data?.length
-  const showSpinner = isFetching && !showSkeleton
-
-  const { data: tabCountsData } = useQuery({
-    queryKey: ["tab-counts", debouncedSearchQuery],
-    queryFn: async () => {
-      const counts: Record<QuickFilterOption, number> = {
-        all: 0,
-        last_released: 0,
-        most_downloaded: 0,
-      }
-
-      if (debouncedSearchQuery) {
-        // For search, we'll use the total count from the search results
-        return counts
-      }
-
-      const { data, error } = await supabase.rpc("get_components_counts")
-
-      if (!error && Array.isArray(data)) {
-        data.forEach((item: any) => {
-          if (
-            typeof item.filter_type === "string" &&
-            typeof item.count === "number" &&
-            item.filter_type in counts
-          ) {
-            counts[item.filter_type as QuickFilterOption] = item.count
-          }
-        })
-      }
-
-      return counts
     },
-    enabled: isStorageLoaded,
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 30,
-    refetchOnWindowFocus: false,
-  })
+  }
 
-  useEffect(() => {
-    if (data?.pages[0]) {
-      setTotalCount(data.pages[0].total_count)
-    }
-    if (tabCountsData) {
-      setTabCounts(tabCountsData)
-    }
-  }, [data?.pages, tabCountsData])
-
-  useTrackHasOnboarded()
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + window.scrollY >=
-          document.documentElement.scrollHeight - 1000 &&
-        !isLoading &&
-        hasNextPage
-      ) {
-        fetchNextPage()
-      }
-    }
-
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [isLoading, hasNextPage, fetchNextPage])
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
+  }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="container mx-auto mt-20"
-    >
-      <div className="flex flex-col">
-        <ComponentsHeader
-          filtersDisabled={!!searchQuery}
-          tabCounts={tabCounts}
-        />
-        {showSkeleton ? (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(270px,1fr))] gap-9 list-none pb-10">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <ComponentCardSkeleton key={i} />
+    <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
+      {/* How to Capture Section */}
+      <section className="py-16 md:py-24 px-4 md:px-8 max-w-6xl mx-auto">
+        <motion.div variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+          <motion.h2 variants={itemVariants} className="text-3xl md:text-4xl font-bold mb-4">
+            How meetings get in
+          </motion.h2>
+          <motion.p variants={itemVariants} className="text-lg text-muted-foreground mb-12 max-w-2xl">
+            Choose how you capture. Everything flows through the same analysis engine.
+          </motion.p>
+
+          <motion.div variants={itemVariants} className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {captureOptions.map((option, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 p-4 rounded-lg border border-border/50 hover:border-border transition-colors"
+              >
+                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <span className="text-foreground">{option}</span>
+              </div>
+            ))}
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* Core Value: The Three Questions */}
+      <section className="py-16 md:py-24 px-4 md:px-8 max-w-6xl mx-auto border-t border-border/50">
+        <motion.div variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+          <motion.h2 variants={itemVariants} className="text-3xl md:text-4xl font-bold mb-4">
+            Three questions answered
+          </motion.h2>
+          <motion.p variants={itemVariants} className="text-lg text-muted-foreground mb-12 max-w-2xl">
+            The product answers these in order, backed by your meetings and the conversations around them.
+          </motion.p>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                number: "1",
+                question: "What do we believe right now?",
+                description: "Current state: active decisions, requirements, constraints, assumptions. Each with evidence and confidence.",
+              },
+              {
+                number: "2",
+                question: "How did we get here?",
+                description: "The path from start to now. Which decisions changed, what triggered it, and what's the evidence.",
+              },
+              {
+                number: "3",
+                question: "What else is being said?",
+                description: "External context from Jira, GitHub, Slack. Related conversations outside of meetings.",
+              },
+            ].map((item, i) => (
+              <motion.div key={i} variants={itemVariants}>
+                <Card className="h-full border border-border/50 hover:border-border transition-colors">
+                  <CardHeader>
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <CardTitle className="text-xl">{item.question}</CardTitle>
+                      </div>
+                      <div className="text-3xl font-bold text-primary/30">{item.number}</div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">{item.description}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
-        ) : (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(270px,1fr))] gap-9 list-none pb-10">
-            {allComponents?.map((component) => (
-              <ComponentCard
-                key={component.id}
-                component={component}
-                isLoading={false}
-              />
+        </motion.div>
+      </section>
+
+      {/* Features */}
+      <section className="py-16 md:py-24 px-4 md:px-8 max-w-6xl mx-auto border-t border-border/50">
+        <motion.div variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+          <motion.h2 variants={itemVariants} className="text-3xl md:text-4xl font-bold mb-4">
+            Built for trust and clarity
+          </motion.h2>
+          <motion.p variants={itemVariants} className="text-lg text-muted-foreground mb-12 max-w-2xl">
+            Every decision backed by evidence. No summaries, no guesses.
+          </motion.p>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((feature, i) => {
+              const Icon = feature.icon
+              return (
+                <motion.div key={i} variants={itemVariants}>
+                  <Card className="h-full border border-border/50 hover:border-border transition-colors">
+                    <CardHeader>
+                      <Icon className="w-6 h-6 text-primary mb-2" />
+                      <CardTitle className="text-lg">{feature.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">{feature.description}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )
+            })}
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Integrations */}
+      <section className="py-16 md:py-24 px-4 md:px-8 max-w-6xl mx-auto border-t border-border/50">
+        <motion.div variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+          <motion.h2 variants={itemVariants} className="text-3xl md:text-4xl font-bold mb-4">
+            Connect your workflow
+          </motion.h2>
+          <motion.p variants={itemVariants} className="text-lg text-muted-foreground mb-12 max-w-2xl">
+            Link your Jira, GitHub, and Slack. ReMind brings the context together.
+          </motion.p>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {integrations.map((integration, i) => (
+              <motion.div key={i} variants={itemVariants}>
+                <Card className="border border-border/50">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">{integration.name}</CardTitle>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full font-medium ${
+                          integration.status === "Live"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-yellow-100 text-yellow-700"
+                        }`}
+                      >
+                        {integration.status}
+                      </span>
+                    </div>
+                    <CardDescription className="text-sm">{integration.description}</CardDescription>
+                  </CardHeader>
+                </Card>
+              </motion.div>
             ))}
           </div>
-        )}
-        {showSpinner && (
-          <div className="col-span-full flex justify-center py-4">
-            <Loader2 className="h-8 w-8 animate-spin text-foreground/20" />
-          </div>
-        )}
-      </div>
-    </motion.div>
+        </motion.div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 md:py-24 px-4 md:px-8 max-w-6xl mx-auto border-t border-border/50">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="text-center"
+        >
+          <motion.h2 variants={itemVariants} className="text-3xl md:text-4xl font-bold mb-6">
+            Start with a transcript
+          </motion.h2>
+          <motion.p variants={itemVariants} className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+            No setup required. Paste a meeting transcript and see what ReMind extracts. Review before sending.
+          </motion.p>
+
+          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" asChild>
+              <Link href="/app/dashboard">Start Now</Link>
+            </Button>
+            <Button size="lg" variant="outline">
+              <a href="https://github.com/remind-project" target="_blank" rel="noreferrer">
+                View on GitHub
+              </a>
+            </Button>
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* Footer CTA */}
+      <section className="py-16 md:py-24 px-4 md:px-8 border-t border-border/50 bg-accent/20">
+        <div className="max-w-6xl mx-auto text-center">
+          <h3 className="text-2xl font-bold mb-4">The memory of your project</h3>
+          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Built from your meetings and the conversations around them. See what you believe, how you got there, and what changed.
+          </p>
+          <Button size="lg" asChild>
+            <Link href="/login">Sign In</Link>
+          </Button>
+        </div>
+      </section>
+    </div>
   )
 }

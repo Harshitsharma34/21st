@@ -19,9 +19,9 @@ export const generateMetadata = async (): Promise<Metadata> => {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "21st.dev - The NPM for Design Engineers",
+    name: "ReMind - The Memory of Your Project",
     description:
-      "Ship polished UIs faster with ready-to-use React Tailwind components inspired by shadcn/ui. Built by design engineers, for design engineers.",
+      "The memory of your project, built from your meetings and the conversations around them. See what you currently believe, how you got there, and what changed.",
     url: process.env.NEXT_PUBLIC_APP_URL,
     potentialAction: {
       "@type": "SearchAction",
@@ -34,22 +34,23 @@ export const generateMetadata = async (): Promise<Metadata> => {
   }
 
   return {
-    title: "21st.dev – The NPM for Design Engineers",
+    title: "ReMind – The Memory of Your Project",
     description:
-      "Ship polished UIs faster with ready-to-use React Tailwind components inspired by shadcn/ui. Built by design engineers, for design engineers.",
+      "The memory of your project, built from your meetings and the conversations around them. See what you currently believe, how you got there, and what changed, with the quote behind every claim.",
     keywords: [
-      "react components",
-      "tailwind css",
-      "ui components",
-      "design engineers",
-      "component library",
-      "shadcn ui",
-      "publish components",
+      "meeting memory",
+      "project memory",
+      "meeting transcripts",
+      "decision tracking",
+      "team collaboration",
+      "meeting notes",
+      "decision log",
+      "project timeline",
     ],
     openGraph: {
-      title: "21st.dev - The NPM for Design Engineers",
+      title: "ReMind - The Memory of Your Project",
       description:
-        "Ship polished UIs faster with ready-to-use React Tailwind components inspired by shadcn/ui. Built by design engineers, for design engineers.",
+        "The memory of your project, built from your meetings and the conversations around them.",
       images: [
         {
           url: `${process.env.NEXT_PUBLIC_APP_URL}/og-image.png`,
@@ -60,9 +61,9 @@ export const generateMetadata = async (): Promise<Metadata> => {
     },
     twitter: {
       card: "summary_large_image",
-      title: "21st.dev - The NPM for Design Engineers",
+      title: "ReMind - The Memory of Your Project",
       description:
-        "Ship polished UIs faster with ready-to-use React Tailwind components inspired by shadcn/ui. Built by design engineers, for design engineers.",
+        "The memory of your project, built from your meetings and the conversations around them.",
       images: [`${process.env.NEXT_PUBLIC_APP_URL}/og-image.png`],
     },
     other: {

@@ -1,8 +1,8 @@
 import { ForgotPasswordForm } from '@/components/auth/forgot-password-form';
 
 export const metadata = {
-  title: 'Forgot Password - MeetSync',
-  description: 'Reset your MeetSync password',
+  title: 'Forgot Password - ReMind',
+  description: 'Reset your ReMind password',
 };
 
 export default function ForgotPasswordPage() {

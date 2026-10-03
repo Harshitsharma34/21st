@@ -1,8 +1,8 @@
 import { ResetPasswordForm } from '@/components/auth/reset-password-form';
 
 export const metadata = {
-  title: 'Reset Password - MeetSync',
-  description: 'Create a new password for your MeetSync account',
+  title: 'Reset Password - ReMind',
+  description: 'Create a new password for your ReMind account',
 };
 
 export default function ResetPasswordPage() {
