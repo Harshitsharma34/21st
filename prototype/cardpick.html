@@ -34,7 +34,7 @@ p{margin:0}
 .i{width:1em;height:1em;stroke-width:1.75;vertical-align:-0.14em;flex:none}
 
 #app{position:relative;min-height:100vh}
-.screen{min-height:100vh;padding-inline:var(--gutter);padding-block:0 120px;animation:screenIn .32s var(--ease) both}
+.screen{min-height:100vh;padding-inline:var(--gutter);padding-block:0 120px;animation:screenIn .32s var(--ease) backwards}
 .screen.leaving{animation:screenOut .18s ease both;position:absolute;inset:0;pointer-events:none}
 @keyframes screenIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes screenOut{to{opacity:0;transform:translateY(-6px)}}
@@ -512,6 +512,7 @@ p{margin:0}
 /* events panel */
 .evt-btn{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:70;height:34px;padding:0 12px;border-radius:9px;background:var(--surface);border:1px solid var(--border);font-size:12px;font-weight:600;display:inline-flex;gap:6px;align-items:center;box-shadow:0 6px 18px -12px rgba(0,0,0,.4)}
 .evt-btn b{background:var(--rec);color:#fff;border-radius:5px;padding:1px 6px;font-size:11px;font-variant-numeric:tabular-nums}
+body.has-dock .screen{padding-bottom:190px}
 body.has-dock .evt-btn{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .evt{position:fixed;right:12px;top:12px;bottom:12px;width:min(360px,calc(100vw - 24px));z-index:71;background:var(--surface);border:1px solid var(--border);border-radius:16px;display:flex;flex-direction:column;opacity:0;visibility:hidden;transform:translateY(12px) scale(.98);transform-origin:100% 100%;transition:opacity .2s,transform .3s var(--ease),visibility 0s .3s;box-shadow:0 30px 60px -30px rgba(0,0,0,.4)}
 .evt.show{opacity:1;visibility:visible;transform:none;transition:opacity .2s,transform .3s var(--ease)}
@@ -588,6 +589,7 @@ body.has-dock .evt-btn{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 
 <div id="app" aria-live="polite"></div>
 <div id="layer"></div>
+<div class="dock" id="dock" hidden></div>
 <div class="toast" id="toast" role="status"></div>
 <button class="evt-btn" id="evtBtn" type="button" aria-controls="evt"><i data-lucide="activity" class="i"></i>Events <b id="evtCount">0</b></button>
 <aside class="evt" id="evt" aria-label="Prototype analytics">
@@ -782,6 +784,9 @@ function go(screen, opts){
   el.innerHTML = SCREENS[screen].html();
   app.appendChild(el);
   document.body.classList.toggle("has-dock", screen === "add");
+  const dock = document.getElementById("dock");
+  dock.hidden = screen !== "add";
+  if (screen !== "add") dock.innerHTML = "";
   window.scrollTo({ top: 0, behavior: "instant" });
   paint();
   SCREENS[screen].mount && SCREENS[screen].mount(el);
@@ -914,8 +919,7 @@ SCREENS.add = {
     </header>
     <div class="search">${icon("search")}<input id="q" type="search" placeholder="Search bank or card" aria-label="Search bank or card" autocomplete="off"></div>
     <div class="grid-cards" id="tiles"></div>
-  </div>
-  <div class="dock" id="dock"></div>`,
+  </div>`,
   mount(el){
     track("card_browser_opened");
     const q = el.querySelector("#q");
