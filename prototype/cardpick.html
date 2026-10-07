@@ -105,17 +105,18 @@ p{margin:0}
 .ig-ava .brand-mark{transform:scale(.8)}
 .ig-ava .brand-mark span:last-child{background:#fff}
 .ig-who{flex:1;line-height:1.2}.ig-who b{font-size:14px;font-weight:600}.ig-who small{display:block;font-size:12px;color:var(--ink-2)}
-.ig-media{position:relative;aspect-ratio:4/5;background:#ECECE6;overflow:hidden}
-.ad-copy{position:absolute;left:22px;right:22px;top:24px}
+.ig-media{position:relative;aspect-ratio:4/5;background:#ECECE6;overflow:hidden;display:flex;flex-direction:column;padding:24px 22px 14px}
+.ad-copy{flex:none}
 .ad-copy h2{font-size:34px;line-height:1.02;letter-spacing:-0.045em}
 .ad-copy h2 em{font-style:normal;color:var(--rec)}
 .ad-copy p{margin-top:12px;font-size:14.5px;color:#3d3d3a;max-width:28ch}
-.ad-fan{position:absolute;left:50%;bottom:58px;width:0;height:0}
-.ad-fan .cc{position:absolute;--w:200px;left:-100px;top:-126px;transition:transform .9s var(--spring),filter .9s;}
-.ad-otas{position:absolute;inset:0;pointer-events:none}
-.ad-otas .ota{position:absolute;--s:38px;box-shadow:0 6px 16px -10px rgba(0,0,0,.4);animation:bob 5s ease-in-out infinite}
-@keyframes bob{50%{transform:translateY(-5px)}}
-.ad-fine{position:absolute;left:0;right:0;bottom:16px;text-align:center;font-size:11.5px;color:#55554f;display:flex;gap:6px;justify-content:center;align-items:center}
+.ad-vis{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:10px}
+.ad-otas{display:flex;gap:10px;justify-content:center}
+.ad-otas .ota{--s:34px;box-shadow:0 6px 14px -10px rgba(0,0,0,.45)}
+.ad-fan{position:relative;width:100%;height:158px}
+.ad-fan .cc{position:absolute;--w:min(168px,46vw);left:50%;bottom:26px;margin-left:calc(min(168px,46vw) / -2);transform-origin:50% 230%;transition:transform .55s var(--spring),box-shadow .4s,z-index 0s .4s}
+.ad-fan .cc.up{transition:transform .55s var(--spring),box-shadow .4s,z-index 0s 0s;box-shadow:0 18px 30px -16px rgba(17,17,17,.55)}
+.ad-fine{position:relative;z-index:11;margin-top:0;text-align:center;font-size:11.5px;color:#55554f;display:flex;gap:6px;justify-content:center;align-items:center}
 .ig-cta{display:flex;align-items:center;justify-content:space-between;width:100%;padding:14px 16px;background:var(--ink);color:#fff;font-weight:600;font-size:15px}
 .ig-cta:hover{background:#000}
 .ig-icons{display:flex;gap:14px;padding:12px 14px 4px;font-size:22px}
@@ -816,13 +817,10 @@ SCREENS.ad = {
           <h2>5 cards.<br><em>Which one</em> should you actually use?</h2>
           <p>Find the best travel offers hiding across the cards you already own.</p>
         </div>
-        <div class="ad-otas">
-          ${otaHTML("mmt",38).replace('class="ota','style="--s:38px;left:9%;bottom:44%" class="ota')}
-          ${otaHTML("ct",38).replace('class="ota','style="--s:38px;right:8%;bottom:47%;animation-delay:-1.2s" class="ota')}
-          ${otaHTML("emt",38).replace('class="ota','style="--s:38px;left:5%;bottom:20%;animation-delay:-2.6s" class="ota')}
-          ${otaHTML("yt",38).replace('class="ota','style="--s:38px;right:5%;bottom:22%;animation-delay:-3.4s" class="ota')}
+        <div class="ad-vis">
+          <div class="ad-otas" aria-label="Checks MakeMyTrip, Cleartrip, EaseMyTrip and Yatra">${["mmt","ct","emt","yt"].map(o => otaHTML(o)).join("")}</div>
+          <div class="ad-fan" id="adFan">${DEFAULT_WALLET.map(id => cardHTML(id)).join("")}</div>
         </div>
-        <div class="ad-fan" id="adFan">${DEFAULT_WALLET.map(id => cardHTML(id)).join("")}</div>
         <div class="ad-fine">${icon("lock")} No card number required.</div>
       </div>
       <button class="ig-cta" type="button" data-action="ad-cta">Find my best offer ${icon("arrow-right")}</button>
@@ -833,17 +831,16 @@ SCREENS.ad = {
   mount(el){
     track("ad_viewed");
     const cards = [...el.querySelectorAll("#adFan .cc")];
-    const pos = [
-      "translate(-74px,30px) rotate(-14deg) scale(.86)",
-      "translate(-38px,14px) rotate(-7deg) scale(.91)",
-      "translate(0,4px) rotate(0deg) scale(.96)",
-      "translate(36px,12px) rotate(7deg) scale(.91)",
-      "translate(0,-14px) rotate(-2deg) scale(1)"
-    ];
-    let order = [0,1,2,3,4];
-    const apply = () => cards.forEach((c,i) => { const p = order.indexOf(i); c.style.transform = pos[p]; c.style.zIndex = p === 4 ? 10 : p; });
+    const angles = [-16,-8,0,8,16];
+    let active = 2;
+    const apply = () => cards.forEach((c,i) => {
+      const up = i === active;
+      c.classList.toggle("up", up);
+      c.style.zIndex = up ? 10 : i;
+      c.style.transform = `rotate(${angles[i]}deg) translateY(${up ? -22 : 0}px)`;
+    });
     apply();
-    if (!reduce) every(() => { order = [order[4], ...order.slice(0,4)]; apply(); }, 1900);
+    if (!reduce) every(() => { active = (active + 1) % cards.length; apply(); }, 1700);
   }
 };
 
