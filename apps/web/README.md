@@ -16,6 +16,17 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+### Travel card offers prototype
+
+Interactive product-design prototype (ad → card selection → recommendations → OTA handoff + 30 Sundays trip opportunity):
+
+```bash
+pnpm dev
+# open http://localhost:3000/travel
+```
+
+No Clerk/Supabase env vars are required for `/travel` routes.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load Inter, a custom Google Font.

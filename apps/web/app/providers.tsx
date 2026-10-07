@@ -24,11 +24,16 @@ export function AppProviders({
   const isHomePage = pathname === "/"
   const isTagPage = pathname.startsWith("/s/")
   const isProPage = pathname.startsWith("/pro")
+  const isTravelPrototype = pathname.startsWith("/travel")
   const showSidebar = isHomePage || isTagPage || isProPage
 
   useEffect(() => {
-    initAmplitude()
-  }, [])
+    if (!isTravelPrototype) initAmplitude()
+  }, [isTravelPrototype])
+
+  if (isTravelPrototype) {
+    return <>{children}</>
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
