@@ -440,9 +440,9 @@ p{margin:0}
 
 /* ---------- HANDOFF ---------- */
 .ho{max-width:520px;margin-inline:auto;padding-top:10px}
-.ho-anim{position:relative;height:150px;display:flex;align-items:center;justify-content:center;gap:56px}
-.ho-anim .ota{--s:64px}
-.ho-anim .cc{--w:130px}
+.ho-anim{position:relative;height:150px;overflow:visible}
+.ho-anim .ota{--s:64px;position:absolute;left:50%;top:50%;margin:-32px 0 0 -32px;z-index:2;box-shadow:0 12px 28px -16px rgba(17,17,17,.45)}
+.ho-anim .cc{--w:120px;position:absolute;top:50%;right:calc(50% + 52px);margin-top:-38px;z-index:1}
 .ho-ready{font-size:12px;letter-spacing:.14em;font-weight:700;color:var(--pos);display:flex;gap:6px;align-items:center}
 .ho h1{font-size:32px;line-height:1.08;margin-top:8px}
 .ho-to{display:flex;align-items:center;gap:12px;margin-top:14px}
@@ -1511,7 +1511,8 @@ SCREENS.handoff = {
   mount(el){
     const a = el.querySelector("#hoAnim"), cc = a.querySelector(".cc"), ota = a.querySelector(".ota"), body = el.querySelector("#hoBody");
     if (reduce) { body.style.opacity = 1; return; }
-    const d = ota.getBoundingClientRect().left - cc.getBoundingClientRect().left - 20;
+    const or = ota.getBoundingClientRect(), cr = cc.getBoundingClientRect();
+    const d = (or.left + or.width / 2) - (cr.left + cr.width / 2);
     cc.animate([{ transform:"translateX(0) scale(1) rotate(0)" },{ transform:`translateX(${d*0.55}px) scale(.7) rotate(-8deg)`, offset:.6 },{ transform:`translateX(${d}px) scale(.42) rotate(0)`, opacity:0 }], { duration:820, easing:"cubic-bezier(.5,0,.2,1)", fill:"forwards" });
     ota.animate([{ transform:"scale(1)" },{ transform:"scale(1)", offset:.75 },{ transform:"scale(1.14)" },{ transform:"scale(1)" }], { duration:1050, easing:"ease-out" });
     later(() => { a.animate([{ height:"150px", opacity:1 },{ height:"0px", opacity:0 }], { duration:320, easing:"ease-in", fill:"forwards" }); }, 1050);
