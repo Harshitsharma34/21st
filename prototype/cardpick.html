@@ -90,8 +90,9 @@ p{margin:0}
 .ota{--s:40px;width:var(--s);height:var(--s);border-radius:calc(var(--s) * .26);display:inline-grid;place-items:center;flex:none;border:1px solid var(--border);background:#fff;overflow:hidden;font-weight:800}
 .ota--mmt b{font-family:Georgia,"Times New Roman",serif;font-style:italic;color:#e5262c;font-size:calc(var(--s) * .5);letter-spacing:-0.06em;transform:translateY(-4%)}
 .ota--ct{background:#f26b21;border-color:#f26b21;color:#fff}
-.ota--ct svg{width:58%;height:58%;stroke-width:3.2}
-.ota--emt svg{width:58%;height:58%;color:#1f74e8;fill:#cfe3ff;stroke-width:1.9;transform:rotate(-8deg) translateX(-4%)}
+.ota svg{width:calc(var(--s) * .56);height:calc(var(--s) * .56);flex:none}
+.ota--ct svg{stroke-width:3.2}
+.ota--emt svg{color:#1f74e8;fill:#cfe3ff;stroke-width:1.9;transform:rotate(-8deg) translateX(-4%)}
 .ota--yt{background:#e1202a;border-color:#e1202a;color:#fff}
 .ota--yt b{font-size:calc(var(--s) * .56);letter-spacing:-0.05em;transform:translateY(-6%)}
 .ota-name{font-weight:600;letter-spacing:-0.015em}
@@ -184,7 +185,7 @@ p{margin:0}
 .match{min-height:100vh;display:flex;flex-direction:column;justify-content:center;max-width:440px;margin-inline:auto;padding-block:30px}
 .match-board{position:relative;height:380px;margin-top:10px}
 .match-board svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.match-board line{stroke:#d2d2cc;stroke-width:1.2;stroke-dasharray:240;stroke-dashoffset:240;transition:stroke-dashoffset .6s var(--ease),stroke .3s,opacity .4s,stroke-width .3s}
+.match-board line{stroke:#d2d2cc;stroke-width:1.2;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .6s var(--ease),stroke .3s,opacity .4s,stroke-width .3s}
 .match-board line.drawn{stroke-dashoffset:0}
 .match-board line.hit{stroke:var(--rec)}
 .match-board line.win{stroke:var(--ink);stroke-width:2.4}
@@ -192,7 +193,7 @@ p{margin:0}
 .m-cards{position:absolute;left:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:space-around}
 .m-cards .cc{--w:118px;transition:transform .4s var(--spring),opacity .4s}
 .m-otas{position:absolute;right:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:space-around;align-items:flex-end}
-.m-ota{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;transition:opacity .4s}
+.m-ota{display:flex;flex-direction:column-reverse;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--ink-2);transition:opacity .4s}
 .m-ota .ota{--s:44px}
 .m-badge{position:absolute;transform:translate(-50%,-50%) scale(.6);opacity:0;background:var(--surface);border:1px solid var(--border);font-size:12px;font-weight:650;padding:3px 7px;border-radius:7px;transition:opacity .25s,transform .35s var(--spring);font-variant-numeric:tabular-nums;white-space:nowrap}
 .m-badge.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
@@ -264,6 +265,30 @@ p{margin:0}
 .nextbest .t b{font-weight:600}
 .nextbest .t small{display:block;color:var(--ink-2);font-size:12.5px}
 .why-foot{display:flex;justify-content:flex-end;margin-top:14px}
+.save{margin-top:18px}
+.save-h{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:var(--ink-2)}
+.save-h b{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2);font-weight:650}
+.save-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:10px;align-items:start}
+.sv{display:flex;flex-direction:column;gap:3px;min-width:0}
+.sv small{font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.sv b{font-size:19px;font-weight:650;letter-spacing:-0.03em;font-variant-numeric:tabular-nums}
+.sv b.no{font-size:13px;font-weight:500;color:var(--muted);letter-spacing:0;padding-block:4px}
+.sv i{display:block;height:3px;border-radius:2px;background:var(--ink);width:var(--p);transform-origin:0 50%;animation:barIn .6s var(--ease) both}
+.sv.full i{background:var(--rec)}
+@keyframes barIn{from{transform:scaleX(0)}}
+.rec-visual{display:none;position:relative;flex-direction:column;justify-content:space-between;gap:18px;border-radius:18px;padding:20px;overflow:hidden;background:radial-gradient(110% 70% at 50% 0%, var(--rec-soft) 0%, transparent 70%), var(--soft);isolation:isolate}
+.rv-glow{position:absolute;left:12%;right:12%;top:26%;height:130px;background:var(--cbg);filter:blur(46px);opacity:.28;z-index:-1;border-radius:50%}
+.rv-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--ink-2)}
+.rv-top span{display:inline-flex;gap:6px;align-items:center}
+.rv-stage{position:relative;flex:1;min-height:210px;display:grid;place-items:center}
+.rv-stage .cc{--w:212px;transform:translate(-10px,22px) rotate(-8deg);transition:transform .55s var(--spring),box-shadow .4s;box-shadow:0 26px 40px -24px rgba(17,17,17,.6),0 2px 6px -2px rgba(17,17,17,.25)}
+.rec:hover .rv-stage .cc{transform:translate(2px,14px) rotate(-4deg)}
+.rv-stage .ota{--s:54px;position:absolute;right:4px;top:calc(50% - 104px);z-index:2;box-shadow:0 0 0 5px var(--soft),0 12px 24px -14px rgba(17,17,17,.5);transition:transform .35s var(--spring)}
+.rec:hover .rv-stage .ota{transform:translate(4px,-4px) scale(1.04)}
+.rv-plus{position:absolute;right:58px;top:20px;width:22px;height:22px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:grid;place-items:center;font-size:12px;color:var(--ink-2);z-index:1}
+.rv-cap{display:grid;gap:2px}
+.rv-cap b{font-size:17px;font-weight:600;letter-spacing:-0.02em}
+.rv-cap span{font-size:13.5px;color:var(--ink-2)}
 .swipe-hint{display:flex;justify-content:center;gap:5px;margin-top:12px}
 .swipe-hint i{width:6px;height:6px;border-radius:3px;background:#d6d6d0;transition:width .25s,background .25s}
 .swipe-hint i.on{width:18px;background:var(--ink)}
@@ -277,12 +302,12 @@ p{margin:0}
 .wslot{position:relative;flex:none;margin-left:-82px;transition:transform .42s var(--spring),margin .42s var(--spring),filter .3s;transform-origin:50% 100%}
 .wslot:first-child{margin-left:0}
 .wslot .cc{--w:112px}
-.wslot > button{display:block;border-radius:8px}
+.wslot > button:not(.wall){display:block;border-radius:8px}
 .wslot.dim{transform:scale(.97);filter:brightness(.92)}
 .wslot.active{transform:translateY(-12px);z-index:30 !important}
 .wslot.active + .wslot{margin-left:-40px}
 .wall{width:64px;height:71px;border-radius:9px;border:1.5px solid var(--ink);background:var(--surface);display:flex;flex-direction:column;justify-content:space-between;padding:9px;text-align:left;font-size:12px;font-weight:600}
-.wall .stk{position:relative;height:22px}
+.wall .stk{display:block;position:relative;height:22px;width:40px;flex:none}
 .wall .stk i{position:absolute;width:26px;height:17px;border-radius:3px;border:1.5px solid var(--ink);background:var(--surface)}
 .wall .stk i:nth-child(1){left:0;top:4px}.wall .stk i:nth-child(2){left:6px;top:2px}.wall .stk i:nth-child(3){left:12px;top:0;background:var(--ink)}
 .wslot.allslot{margin-right:12px}
@@ -538,11 +563,10 @@ body.has-dock .evt-btn{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
   .equation{font-size:28px}
   .home-h1{font-size:44px}
   .home-grid{grid-template-columns:minmax(0,1fr) 340px;grid-template-areas:"main wallet" "alts alts" "trip trip";gap:36px 40px}
-  .rec-body{padding:26px 28px 26px;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:24px}
-  .rec-body > *{grid-column:1}
-  .rec-row{grid-column:1 / -1}
-  .rec-cardslot{margin-right:0}
-  .rec-cardslot .cc{--w:150px}
+  .rec-body{padding:22px;display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,300px);gap:28px}
+  .rec-info{padding:6px 0 4px 6px}
+  .rec-cardslot{display:none}
+  .rec-visual{display:flex}
   .big{font-size:96px}
   .rec-strip{padding:11px 28px}
   .rec-actions{grid-template-columns:minmax(0,1fr) auto;gap:10px}
@@ -554,7 +578,7 @@ body.has-dock .evt-btn{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
   .wslot > button{width:100%}
   .wall{width:100%}
   .wal-add{display:none}
-  .wslot.allslot{margin-right:0;margin-bottom:116px}
+  .wslot.allslot{margin-right:0;margin-bottom:14px}
   .wslot.allslot + .wslot{margin-top:0}
   .wall{width:100%;height:auto;flex-direction:row;align-items:center;gap:12px;padding:12px;justify-content:flex-start}
   .wslot.active{transform:translateX(-10px)}
@@ -1019,23 +1043,23 @@ SCREENS.matching = {
       const a = pt(`.m-cards [data-card="${o.card}"]`, "r"), b = pt(`.m-ota[data-ota="${o.ota}"] .ota`, "l");
       return { o, a, b };
     });
-    svg.innerHTML = lines.map((l,i) => `<line id="ln${i}" x1="${l.a.x}" y1="${l.a.y}" x2="${l.b.x - 6}" y2="${l.b.y}"/>`).join("");
+    svg.innerHTML = lines.map((l,i) => `<line pathLength="1" id="ln${i}" x1="${l.a.x}" y1="${l.a.y}" x2="${l.b.x - 6}" y2="${l.b.y}"/>`).join("");
     lines.forEach((l,i) => {
       const b = document.createElement("span");
       b.className = "m-badge" + (l.o === best ? " win" : "");
       b.id = "bd" + i; b.textContent = l.o.kind === "flat" ? inr(l.o.flat) : l.o.pct + "%";
-      const t = 0.42 + (i % 3) * 0.1;
+      const t = 0.5;
       b.style.left = (l.a.x + (l.b.x - l.a.x)*t) + "px"; b.style.top = (l.a.y + (l.b.y - l.a.y)*t) + "px";
       board.appendChild(b);
     });
     const status = (h, p) => { el.querySelector("#mStatus").innerHTML = `<div class="m-step"><h2>${h}</h2>${p ? `<p>${p}</p>` : ""}</div>`; };
     const sp = reduce ? 0.25 : 1;
     later(() => { status("Scanning current travel offers…", "MakeMyTrip, Cleartrip, EaseMyTrip, Yatra"); el.querySelector("#cP").textContent = 4; lines.forEach((l,i) => later(() => el.querySelector("#ln"+i).classList.add("drawn"), i*45*sp)); }, 600*sp);
-    later(() => { status("Checking eligibility…", "Minimum spends, caps and validity"); lines.forEach((l,i) => later(() => { el.querySelector("#ln"+i).classList.add("hit"); el.querySelector("#bd"+i).classList.add("show"); el.querySelector("#cO").textContent = i+1; }, i*70*sp)); }, 1300*sp);
+    later(() => { status("Checking eligibility…", "Minimum spends, caps and validity"); lines.forEach((l,i) => later(() => { el.querySelector("#ln"+i).classList.add("hit"); const bd = el.querySelector("#bd"+i); bd.classList.add("show"); later(() => bd.classList.remove("show"), 520*sp); el.querySelector("#cO").textContent = i+1; }, i*110*sp)); }, 1300*sp);
     later(() => { status(`Comparing ${shown.length*4} combinations…`, "Card × platform"); }, 2200*sp);
     later(() => {
       status(`${allOffers.length} offers match your cards.`, "");
-      lines.forEach((l,i) => { const w = l.o === best; el.querySelector("#ln"+i).classList.toggle("win", w); el.querySelector("#ln"+i).classList.toggle("fade", !w); if (!w) el.querySelector("#bd"+i).classList.remove("show"); });
+      lines.forEach((l,i) => { const w = l.o === best; el.querySelector("#ln"+i).classList.toggle("win", w); el.querySelector("#ln"+i).classList.toggle("fade", !w); el.querySelector("#bd"+i).classList.toggle("show", w); });
       el.querySelectorAll(".m-cards .cc").forEach(c => { if (!best || c.dataset.card !== best.card) c.style.opacity = .35; else c.style.transform = "translateX(6px) scale(1.04)"; });
       el.querySelectorAll(".m-ota").forEach(c => { if (!best || c.dataset.ota !== best.ota) c.style.opacity = .35; });
     }, 2800*sp);
@@ -1085,6 +1109,12 @@ function modesHTML(){
   const tabs = [["best","Best overall"],["spend","Higher spend"],["cash","Cashback"]].filter(([m]) => m === "best" ? p.best : m === "spend" ? p.spend : p.cash);
   return `<div class="modes" role="tablist">${tabs.map(([m,l]) => `<button role="tab" type="button" aria-selected="${state.mode === m}" data-action="mode" data-mode="${m}">${l}</button>`).join("")}</div>`;
 }
+function saveHTML(o){
+  const amts = [5000, 10000, 20000];
+  const vals = amts.map(a => benefit(o, a));
+  return `<div class="save"><div class="save-h"><b>What you'd save</b><span>by booking value</span></div>
+    <div class="save-row">${amts.map((a,i) => `<div class="sv ${vals[i] && vals[i] >= maxB(o) ? "full" : ""}"><small>${k(a)} booking</small>${vals[i] ? `<b>${inr(vals[i])}</b>` : `<b class="no">Below ${k(o.min)} min</b>`}<i style="--p:${vals[i] ? Math.max(8, vals[i] / maxB(o) * 100) : 0}%"></i></div>`).join("")}</div></div>`;
+}
 function recHTML(o, opts){
   opts = opts || {};
   if (!o) return `<div class="rec"><div class="rec-body"><h3 style="font-size:20px">No live travel offers on this card</h3><p class="muted" style="margin-top:8px">We'll keep checking. Your other cards still have offers.</p><div style="margin-top:16px"><button class="btn ghost sm" type="button" data-action="filter" data-id="all">Show all cards</button></div></div></div>`;
@@ -1105,12 +1135,14 @@ function recHTML(o, opts){
   return `<article class="rec" id="rec" data-offer="${o.id}">
     <div class="rec-strip">${strip}</div>
     <div class="rec-body" id="recBody">
+     <div class="rec-info">
       <div class="rec-row">
         <div class="rec-ota">${otaHTML(o.ota)}<div><span class="ota-name">${OTAS[o.ota].name}</span><small>${o.cat}</small></div></div>
         <div class="rec-cardslot">${cardHTML(o.card)}</div>
       </div>
       <div class="rec-benefit"><span class="big">${headline(o)}</span><span class="big-u">${unitLabel(o).replace(" ","<br>")}</span></div>
       <p class="cap">Up to <b class="num">${inr(maxB(o))}</b>${o.kind === "cashback" ? ` <span class="chip-later">${icon("clock")} Credited later</span>` : ""}</p>
+      ${saveHTML(o)}
       <p class="use-line">${icon("credit-card")} Use <b>${cardFull(o.card)}</b></p>
       <dl class="facts">
         <div><dt>Min spend</dt><dd>${inr(o.min)}</dd></div>
@@ -1136,6 +1168,13 @@ function recHTML(o, opts){
         <button class="btn ghost" type="button" data-action="why" aria-expanded="${state.whyOpen}" aria-controls="whyWrap">${state.whyOpen ? "Hide reasons" : "Why this one?"}</button>
       </div>
       ${state.filter === "all" ? `<div class="swipe-hint" aria-hidden="true">${["best","spend","cash"].filter(m => m !== "cash" || picks().cash).map(m => `<i class="${state.mode === m ? "on" : ""}"></i>`).join("")}</div>` : ""}
+     </div>
+     <aside class="rec-visual" style="--cbg:${C[o.card].bg}" aria-hidden="true">
+      <span class="rv-glow"></span>
+      <div class="rv-top"><span>${icon("refresh-cw")} Checked 2 min ago</span><span>${daysLeft(o) <= 10 ? daysLeft(o) + " days left" : "Until " + fmtDate(o.ends)}</span></div>
+      <div class="rv-stage">${cardHTML(o.card)}${otaHTML(o.ota)}</div>
+      <div class="rv-cap"><span>Pay with</span><b>${C[o.card].bank} ${C[o.card].name}</b><span>on ${OTAS[o.ota].name}, ${o.cat.toLowerCase()}</span></div>
+     </aside>
     </div>
   </article>`;
 }
@@ -1149,7 +1188,7 @@ function drawMain(animate){
     if (animate && !reduce) {
       const body = g.querySelector("#recBody");
       body && body.animate([{ opacity:0, transform:"translateY(8px)" },{ opacity:1, transform:"none" }], { duration:280, easing:"cubic-bezier(.2,.8,.2,1)" });
-      const slot = g.querySelector(".rec-cardslot");
+      const slot = g.querySelector(innerWidth >= 900 ? ".rv-stage" : ".rec-cardslot");
       slot && slot.animate([{ transform:"translateX(40px) rotate(6deg)", opacity:0 },{ transform:"none", opacity:1 }], { duration:420, easing:"cubic-bezier(.34,1.25,.64,1)" });
     }
   };
