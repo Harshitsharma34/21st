@@ -1224,6 +1224,19 @@ body,.rec,.alt,.cd,.btn,.iconbtn,.route-pill{transition:background-color .25s,bo
 .sec-h{align-items:center}
 .sec-h .link,.miss-tog{margin-left:auto}
 .miss-d > summary.sec-h{display:flex}
+
+/* trip story: readable over the photo */
+.story .scene::after{background:linear-gradient(90deg,rgba(4,4,6,.82) 0%,rgba(4,4,6,.62) 45%,rgba(4,4,6,.35) 100%),linear-gradient(180deg,rgba(4,4,6,.35) 0%,rgba(4,4,6,.15) 40%,rgba(4,4,6,.75) 100%)}
+@media (max-width:899px){ .story .scene::after{background:linear-gradient(180deg,rgba(4,4,6,.55) 0%,rgba(4,4,6,.6) 50%,rgba(4,4,6,.88) 100%)} }
+.preview .hero .scene::after{background:linear-gradient(180deg,rgba(4,4,6,.35) 0%,rgba(4,4,6,.2) 40%,rgba(4,4,6,.85) 100%)}
+.story .st-sub,.story .st-list li,.story .st-q{text-shadow:0 1px 12px rgba(0,0,0,.45)}
+.story .st-k{color:#ffe1bf}
+.story .glass{background:rgba(4,4,6,.72)}
+.story .iconbtn,.preview .iconbtn{background:rgba(4,4,6,.72);border:1px solid rgba(255,255,255,.35);color:#fff;width:44px;height:44px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.story .iconbtn:hover,.preview .iconbtn:hover{background:rgba(4,4,6,.9)}
+
+.why-now .cc .cc-mid,.why-now .cc .cc-id,.why-now .cc .cc-name,.adv .cc .cc-mid,.adv .cc .cc-id,.adv .cc .cc-name{display:none}
+.why-now .cc .cc-in,.adv .cc .cc-in{padding:9cqw 10cqw}
 </style>
 
 <div id="app" aria-live="polite"></div>
