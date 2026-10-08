@@ -1164,6 +1164,28 @@ body,.rec,.alt,.cd,.btn,.iconbtn,.route-pill{transition:background-color .25s,bo
 .scene-bali::after{background:linear-gradient(180deg,rgba(4,4,6,.05) 40%,rgba(4,4,6,.35) 100%)}
 .trip2 .scene{background-position:center 72% !important}
 @media (min-width:900px){ .trip2 .scene{left:30%;background-position:center 66% !important} }
+
+/* collapsible misses */
+.miss-d > summary{list-style:none;cursor:pointer}
+.miss-d > summary::-webkit-details-marker{display:none}
+.miss-tog{display:inline-flex;align-items:center;gap:4px;font-size:13.5px;font-weight:500;color:var(--rec)}
+.miss-tog .i{transition:transform .25s}
+.miss-d[open] .miss-tog .i{transform:rotate(180deg)}
+/* ---------- mobile: one clear column, no sideways scrolling ---------- */
+@media (max-width:899px){
+  .res-grid{gap:34px;grid-template-areas:"main" "catch" "also" "miss" "cards" "trip"}
+  .res-grid.res-none{grid-template-areas:"main" "miss" "cards"}
+  .alts{grid-auto-flow:row;grid-auto-columns:auto;grid-template-columns:minmax(0,1fr);overflow:visible;margin-inline:0;padding-inline:0;gap:10px}
+  .alt{padding:14px;gap:10px}
+  .alt .alt-v b{font-size:26px}
+  .alt-pair{flex-wrap:wrap;row-gap:6px}
+  .sec-h{margin-bottom:10px}
+  .sec-h h3{font-size:18px}
+  .miss-d .sec-h{margin-bottom:0;padding:14px 16px;border:1px solid var(--border);border-radius:var(--r-card);background:var(--surface)}
+  .miss-d[open] .sec-h{margin-bottom:10px}
+  .scan{font-size:13px}
+  .g-cards{padding-top:6px;border-top:1px solid var(--border)}
+}
 </style>
 
 <div id="app" aria-live="polite"></div>
@@ -1286,7 +1308,7 @@ function nextBookDay(days){
 }
 /* Certainty: what we cannot verify lowers confidence instead of being hidden. */
 const CERT = { monthly: .85, newUser: .4, emi: .6, cashback: .92 };
-const certLabel = c => c >= .95 ? "Will apply" : c >= .8 ? "Likely to apply" : "Depends on you";
+const certLabel = c => c >= .95 ? "Ready to use" : c >= .8 ? "1 thing to check" : "Check conditions";
 const certKey = c => c >= .95 ? "sure" : c >= .8 ? "likely" : "depends";
 
 /* Evaluate one offer against the route: returns status, the airline we would book, the real saving and every condition. */
@@ -1838,6 +1860,7 @@ SCREENS.home = {
     if (res.none) track("no_offer_shown", { route: routeLabel(res.r) });
     else { track("recommendation_viewed", { offer: res.rec.o.id, saving: res.rec.saving, certainty: certLabel(res.rec.cert) }); drawTrip(); }
     track("conditions_shown", { route: routeLabel(res.r), misses: res.misses.length });
+    const md = document.getElementById("missD"); if (md && innerWidth >= 900) md.open = true;
   }
 };
 function checksHTML(e){
@@ -1909,7 +1932,7 @@ function catchHTML(res){
 }
 function alsoHTML(res){
   return `<section class="g-also">
-    <div class="sec-h"><h3>Also works</h3><button class="link" type="button" data-action="all-offers">All offers ${icon("arrow-right")}</button></div>
+    <div class="sec-h"><h3>Other offers that work</h3><button class="link" type="button" data-action="all-offers">All offers ${icon("arrow-right")}</button></div>
     <div class="alts">${(() => { const shown = res.also.slice(0,3); const big = shown.slice().sort((a,b) => b.saving - a.saving)[0]; const sure = shown.filter(x => x.cert >= .95).sort((a,b) => b.saving - a.saving)[0]; return shown.map(e => {
       const o = e.o;
       const role = e === big ? "Biggest saving" : e === sure ? "Surest bet" : "Also an option";
@@ -1951,7 +1974,8 @@ function cardsPanelHTML(res){
 function missesHTML(res){
   if (!res.misses.length) return "";
   return `<section class="g-miss">
-    <div class="sec-h"><h3>Why these don't apply</h3><span class="muted" style="font-size:13px">${res.misses.length} offer${res.misses.length === 1 ? "" : "s"}</span></div>
+    <details class="miss-d" id="missD">
+    <summary class="sec-h miss-sum"><h3>${res.misses.length} offer${res.misses.length === 1 ? " doesn't" : "s don't"} fit this flight</h3><span class="miss-tog">See why ${icon("chevron-down")}</span></summary>
     <div class="alts miss-alts">${res.misses.map(e => `<button type="button" class="alt alt--miss" data-action="open-offer" data-id="${e.o.id}">
       ${e.status === "blocked" ? "" : `<span class="alt-k"><span>${e.status === "catch" ? "Has a catch" : "Not worth it"}</span>${statusChip(e)}</span>`}
       ${pairHTML(e.o)}
@@ -1959,6 +1983,7 @@ function missesHTML(res){
       <span class="alt-why">${icon(e.status === "catch" ? "calendar-clock" : e.status === "notworth" ? "scale" : "circle-slash")}<span>${e.fails[0]}</span></span>
       ${e.unlock ? `<span class="alt-fix">${icon("lightbulb")}<span>${e.unlock}</span></span>` : ""}
     </button>`).join("")}</div>
+    </details>
   </section>`;
 }
 function noneHTML(res){
