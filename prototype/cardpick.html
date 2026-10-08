@@ -1101,12 +1101,69 @@ main.screen[data-screen="landing"]::after{content:"";position:absolute;left:0;ri
 .ho-anim{animation:hoUp .45s 1.05s cubic-bezier(.5,0,.75,0) forwards}
 @keyframes hoUp{to{opacity:0;transform:translateY(-28px);height:0;margin:0}}
 .remember{position:relative}
+
+/* ================= LIGHT THEME (same tokens, AA-checked) ================= */
+:root[data-theme="light"]{
+  color-scheme: light;
+  --canvas:#f6f6f3; --surface:#ffffff; --soft:#efefeb; --border:#e3e3de; --border-2:#cfcfc9;
+  --ink:#0b0b0d; --body:#25262c; --ink-2:#5b5e69; --muted:#9a9ca5; --steel:#6e717c; --mist:#4a4d57;
+  --action:#0b0b0d; --on-action:#ffffff;
+  --rec:#9a5a2a; --rec-soft:rgba(154,90,42,.08);
+  --pos:#2b7449; --pos-soft:rgba(43,116,73,.08);
+  --warn:#8a5800; --warn-soft:rgba(138,88,0,.07); --danger:#ad3528; --danger-soft:rgba(173,53,40,.07);
+  --gilded: linear-gradient(103deg,#7a5a20,#b8892f 40%,#6e5019 70%,#9a7330);
+}
+:root[data-theme="light"] .btn:hover{background:#2a2b31}
+:root[data-theme="light"] .date.on{color:#fff}
+:root[data-theme="light"] .date.on small,:root[data-theme="light"] .date.on span{color:rgba(255,255,255,.78)}
+:root[data-theme="light"] .seg button[aria-pressed="true"]{color:#fff}
+:root[data-theme="light"] .toast{color:#fff}
+:root[data-theme="light"] .evt-btn b{color:#fff}
+:root[data-theme="light"] .ig{background:#fff;border-color:#dbdbdb}
+:root[data-theme="light"] .ig-cap b,:root[data-theme="light"] .ig-who b{color:var(--ink)}
+:root[data-theme="light"] .ig-cta{background:var(--ink);color:#fff}
+:root[data-theme="light"] .ig-cta:hover{background:#2a2b31}
+:root[data-theme="light"] .ig-ava .brand-mark span:last-child{background:var(--ink)}
+:root[data-theme="light"] .ad-tag{background:rgba(255,255,255,.94);border-color:var(--border)}
+:root[data-theme="light"] .dock{background:rgba(246,246,243,.92)}
+:root[data-theme="light"] .catch-line{color:#5e400f}
+:root[data-theme="light"] .catchc{border-color:rgba(138,88,0,.22)}
+:root[data-theme="light"] .match-board line.win{stroke:#7a5a20}
+:root[data-theme="light"] .ota{box-shadow:inset 0 0 0 1px var(--border)}
+:root[data-theme="light"] .ota--mmt,:root[data-theme="light"] .ota--ct,:root[data-theme="light"] .ota--yt{box-shadow:none}
+:root[data-theme="light"] .rec,:root[data-theme="light"] .alt,:root[data-theme="light"] .also-row,:root[data-theme="light"] .miss,:root[data-theme="light"] .do-box,:root[data-theme="light"] .remember-box,:root[data-theme="light"] .g-cards{box-shadow:0 1px 2px rgba(17,17,17,.04)}
+:root[data-theme="light"] .ck-dot{box-shadow:inset 0 0 0 1px rgba(43,116,73,.45)}
+:root[data-theme="light"] .head--unknown .hd-i{box-shadow:inset 0 0 0 1px rgba(138,88,0,.45)}
+:root[data-theme="light"] .head--choice .hd-i{box-shadow:inset 0 0 0 1px rgba(74,77,87,.4)}
+:root[data-theme="light"] .head--fail .hd-i{box-shadow:inset 0 0 0 1px rgba(173,53,40,.45)}
+:root[data-theme="light"] .cd--unknown{background:rgba(138,88,0,.035)}
+:root[data-theme="light"] .tip{border-color:rgba(154,90,42,.25)}
+:root[data-theme="light"] .ws-dot{box-shadow:0 0 0 2px #fff}
+:root[data-theme="light"] .sheet-bg{background:rgba(11,11,13,.35)}
+:root[data-theme="light"] main.screen::after{background-image:radial-gradient(rgba(11,11,13,.075) 1px, transparent 1.3px)}
+:root[data-theme="light"] main.screen[data-screen="home"]::before,:root[data-theme="light"] main.screen[data-screen="detail"]::before,:root[data-theme="light"] main.screen[data-screen="offers"]::before,:root[data-theme="light"] main.screen[data-screen="landing"]::before{background:radial-gradient(55% 38% at 82% 0%, rgba(154,90,42,.12), transparent 72%),radial-gradient(45% 30% at 6% 8%, rgba(184,137,47,.08), transparent 70%)}
+:root[data-theme="light"] .rec-visual{background:radial-gradient(110% 70% at 50% 0%, rgba(154,90,42,.07) 0%, transparent 70%), var(--soft)}
+:root[data-theme="light"] .l-on-dark{display:none}
+:root:not([data-theme="light"]) .l-on-light{display:none}
+/* theme toggle */
+.theme-btn{position:fixed;right:0;top:calc(38% - 42px);z-index:70;height:34px;width:42px;padding:0 0 0 4px;border-radius:9px 0 0 9px;border:1px solid var(--border-2);border-right:0;background:var(--soft);color:var(--body);display:grid;place-items:center;font-size:16px}
+.theme-btn:hover{color:var(--ink)}
+.theme-btn .i-sun{display:none}
+:root[data-theme="light"] .theme-btn .i-sun{display:block}
+:root[data-theme="light"] .theme-btn .i-moon{display:none}
+html{transition:background-color .3s}
+body,.rec,.alt,.cd,.btn,.iconbtn,.route-pill{transition:background-color .25s,border-color .25s,color .25s}
+
+/* AA: text never uses the decorative muted grey */
+.land-foot,.wal-tip,.pv-fine,.pay-net s{color:var(--ink-2)}
+.theme-btn:focus-visible,.evt-btn:focus-visible{outline:2px solid var(--rec);outline-offset:2px}
 </style>
 
 <div id="app" aria-live="polite"></div>
 <div id="layer"></div>
 <div class="dock" id="dock" hidden></div>
 <div class="toast" id="toast" role="status"></div>
+<button class="theme-btn" id="themeBtn" type="button" aria-label="Switch to light mode" aria-pressed="false"><i data-lucide="sun" class="i i-sun"></i><i data-lucide="moon" class="i i-moon"></i></button>
 <button class="evt-btn" id="evtBtn" type="button" aria-controls="evt" aria-label="Prototype analytics"><i data-lucide="activity" class="i"></i><span class="evt-t">Events</span> <b id="evtCount">0</b></button>
 <aside class="evt" id="evt" aria-label="Prototype analytics">
   <div class="evt-h"><b>Prototype analytics</b><button class="iconbtn" id="evtClose" type="button" aria-label="Close analytics"><i data-lucide="x" class="i"></i></button></div>
@@ -2220,7 +2277,7 @@ function openPrefs(step){
       <div class="opt-grid">${OPTS.map(([id,l,s,ic]) => `<button type="button" class="opt ${t.opt === id ? "sel" : ""}" data-action="opt" data-id="${id}" aria-pressed="${t.opt === id}">${icon(ic)}<b>${l}</b><small>${s}</small></button>`).join("")}</div>`;
   else inner = `<div class="gen"><div><h2 style="font-size:26px">Shaping your Bali trip</h2><p>Matching your pace to your card benefits</p><div class="gen-bar"><i></i></div></div></div>`;
   layer.innerHTML = `<div class="prefs" role="dialog" aria-modal="true" aria-label="Trip preferences"><div class="prefs-in">
-    <div class="story-top" style="color:var(--ink)"><button class="iconbtn" type="button" data-action="${step === 1 ? "back-story" : "prefs-back"}" aria-label="Back">${icon("arrow-left")}</button>${logo30()}<span style="width:40px"></span></div>
+    <div class="story-top" style="color:var(--ink)"><button class="iconbtn" type="button" data-action="${step === 1 ? "back-story" : "prefs-back"}" aria-label="Back">${icon("arrow-left")}</button><span class="l-on-dark">${logo30()}</span><span class="l-on-light">${logo30("dark")}</span><span style="width:40px"></span></div>
     ${inner}
   </div>
   ${step < 3 ? `<div class="dock"><div class="dock-in" style="grid-template-columns:1fr"><button class="btn block" type="button" data-action="${step === 1 ? "prefs-next" : "prefs-gen"}" ${(step === 1 ? t.vibe : t.opt) ? "" : "disabled"}>${step === 1 ? "Next" : "Show our trip"} ${icon("arrow-right")}</button></div></div>` : ""}
@@ -2374,6 +2431,14 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") { closeSheet
 document.getElementById("evtBtn").addEventListener("click", () => document.getElementById("evt").classList.toggle("show"));
 document.getElementById("evtClose").addEventListener("click", () => document.getElementById("evt").classList.remove("show"));
 
+/* theme: viewer's explicit choice or saved preference, dark by default */
+(function initTheme(){
+  const root = document.documentElement, btn = document.getElementById("themeBtn");
+  const saved = store.get("theme", null);
+  const set = t => { root.dataset.theme = t; const light = t === "light"; btn.setAttribute("aria-pressed", String(light)); btn.setAttribute("aria-label", light ? "Switch to dark mode" : "Switch to light mode"); btn.title = btn.getAttribute("aria-label"); };
+  set(saved || root.dataset.theme || "dark");
+  btn.addEventListener("click", () => { const t = root.dataset.theme === "light" ? "dark" : "light"; set(t); store.set("theme", t); track("theme_changed", { theme: t }); });
+})();
 renderEvents();
 go("ad");
 if (!window.lucide) window.addEventListener("load", paint);
