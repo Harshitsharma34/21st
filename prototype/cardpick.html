@@ -1186,7 +1186,7 @@ function evaluate(o, r, fares){
   if (o.min) {
     const ok = best && best.saving > 0;
     conds.push({ sh: `Min ${k(o.min)}`, s: ok ? "pass" : "fail", t: `Minimum booking ${inr(o.min)}`, d: ok ? `Your fare is about ${inr(best.fare)}${r.pax > 1 ? ` for ${r.pax}` : ""}` : `Fares on this route are about ${inr(allowed.length ? Math.min(...fares.filter(f => allowed.includes(f.air)).map(f => f.fare)) : cheapest)}` });
-    if (!ok && allowed.length && !o.intl) fails.push(`Needs a ${inr(o.min)}+ booking; the fare here is about ${inr(Math.min(...fares.filter(f => allowed.includes(f.air)).map(f => f.fare)))}`);
+    if (!ok && allowed.length && !o.intl) fails.push(`Needs ${inr(o.min)}+. Fare is about ${inr(Math.min(...fares.filter(f => allowed.includes(f.air)).map(f => f.fare)))}`);
   }
   // booking days
   if (o.bookDays) {
@@ -1200,9 +1200,9 @@ function evaluate(o, r, fares){
   // EMI
   if (o.emi) { conds.push({ s: "choice", t: "Only if you pay in EMI", d: `3+ month EMI. The ${inr(o.emiFee)} fee is already deducted` }); cert *= CERT.emi; }
   // monthly cap
-  if (o.monthly) { conds.push({ s: "unknown", t: "Once per card per month", d: "We can't see if you've used it this month" }); cert *= CERT.monthly; }
+  if (o.monthly) { conds.push({ s: "unknown", t: "Once per card per month", d: "If you've used it this month, it won't apply" }); cert *= CERT.monthly; }
   // new users
-  if (o.newUser) { conds.push({ s: "unknown", t: `First booking on ${OTAS[o.ota].name} only`, d: "Most people with an account won't qualify" }); cert *= CERT.newUser; }
+  if (o.newUser) { conds.push({ s: "unknown", t: `First booking on ${OTAS[o.ota].name} only`, d: "Won't apply if you've booked there before" }); cert *= CERT.newUser; }
   // payout
   if (o.kind === "cashback") { conds.push({ s: "unknown", t: `Cashback, credited in about ${o.creditDays} days`, d: "You pay the full fare at checkout" }); cert *= CERT.cashback; }
   else conds.push({ sh: "At checkout", s: "pass", t: "Discount at checkout", d: o.code ? `Code ${o.code}, usually applied for you` : "Applied when you pay with the card" });
@@ -1215,13 +1215,13 @@ function evaluate(o, r, fares){
   else if (catchDay) status = "catch";
   else if (net >= cheapest - 50) status = "notworth";
   else status = "use";
-  if (status === "notworth") fails.push(`Saves ${inr(saving)}, but only on ${AIRLINES[best.air].name}. You'd still pay more than the cheapest fare (${inr(cheapest)})`);
+  if (status === "notworth") fails.push(`Saves ${inr(saving)} on ${AIRLINES[best.air].name}, but you'd still pay more than the cheapest fare`);
   // unlock hints, so a miss is still useful
   let unlock = null;
   if (status === "blocked" && o.min && !o.intl && allowed.length && topFare && fails.length === 1 && fails[0].startsWith("Needs")) {
     const per = Math.min(...fares.filter(f => allowed.includes(f.air)).map(f => f.fare)) / r.pax;
     const need = Math.ceil(o.min / per);
-    if (need >= 2 && need <= 4 && need !== r.pax) unlock = `Applies if you book for ${need} travellers together`;
+    if (need >= 2 && need <= 4 && need !== r.pax) unlock = `Works if you book for ${need}`;
   }
   if (status === "catch") { unlock = `Book on ${fmtDay(catchDay)} to save about ${inr(saving)}`; fails.push(`${dayRange(o.bookDays)}. Today is ${DAYL[TODAY.getDay()]}`); }
   return { o, status, air: best && best.air, fare: best ? best.fare : cheapest, saving, net, cert, expNet: (best ? best.fare : cheapest) - saving * cert, conds, fails, unlock, catchDay };
@@ -1379,7 +1379,7 @@ SCREENS.ad = {
       <div class="ig-media">
         <div class="ad-copy">
           <h2>5 cards.<br><em>Which one</em> should you actually use?</h2>
-          <p>We check the fine print on your cards for your flight, and tell you what you'll actually save.</p>
+          <p>Tell us your flight. We'll tell you which card saves you the most.</p>
         </div>
         <div class="ad-vis">
           <div class="ad-otas" aria-label="Checks MakeMyTrip, Cleartrip, EaseMyTrip and Yatra">${["mmt","ct","emt","yt"].map(o => otaHTML(o)).join("")}</div>
@@ -1389,7 +1389,7 @@ SCREENS.ad = {
       </div>
       <button class="ig-cta" type="button" data-action="ad-cta">Find my best offer ${icon("arrow-right")}</button>
       <div class="ig-icons">${icon("heart")}${icon("message-circle")}${icon("send")}<span>${icon("bookmark")}</span></div>
-      <p class="ig-cap"><b>30sundays</b> Your cards have flight offers on them. Tell us your route and we'll show what you'll actually save, fine print included.</p>
+      <p class="ig-cap"><b>30sundays</b> Most flight offers sit on cards you already own.</p>
     </article>
   </div>`,
   mount(el){
@@ -1415,9 +1415,8 @@ SCREENS.landing = {
     <nav class="bar">${brand()}<button class="btn ghost sm" type="button" data-action="landing-cta">Check a flight</button></nav>
     <section class="land-hero">
       <div>
-        <div class="label">Your cards. Your flight. One honest answer.</div>
         <h1 style="margin-top:14px">Which card should you pay with for this flight?</h1>
-        <p class="sub">Tell us your route and your cards. We read the fine print and show what you'll actually save, or tell you when nothing applies.</p>
+        <p class="sub">We read every offer's fine print and show what you'll actually save. If nothing applies, we say so.</p>
         <div class="land-cta">
           <button class="btn" type="button" data-action="landing-cta">Check a flight ${icon("arrow-right")}</button>
           <span class="reassure">${icon("shield-check")} No card number. No CVV. No payment information.</span>
@@ -1588,11 +1587,11 @@ SCREENS.route = {
         <button type="button" class="iconbtn" data-action="pax" data-d="-1" aria-label="Fewer travellers">${icon("minus")}</button>
         <b id="paxN" class="num">${r.pax}</b>
         <button type="button" class="iconbtn" data-action="pax" data-d="1" aria-label="More travellers">${icon("plus")}</button>
-        <small>Minimum spends count the whole booking, so this matters.</small>
+        <small>Offer minimums count the whole booking.</small>
       </div>
       <div class="rt-cta">
         <button class="btn block" type="button" data-action="route-go">${state.wallet.length ? `Check my ${state.wallet.length} cards for this flight` : "Next: pick your cards"} ${icon("arrow-right")}</button>
-        ${state.wallet.length ? `<button class="link" type="button" data-action="go-add" style="margin-top:14px">Using your ${state.wallet.length} saved cards. Edit</button>` : ""}
+        ${state.wallet.length ? `<button class="link" type="button" data-action="go-add" style="margin-top:14px">Edit cards</button>` : ""}
       </div>
     </div>`;
   },
@@ -1684,7 +1683,7 @@ SCREENS.home = {
     return `<div class="wrap-wide">
       <nav class="bar"><button class="iconbtn" type="button" data-action="edit-route" aria-label="Change flight">${icon("arrow-left")}</button>${brand()}<button class="iconbtn" type="button" data-action="all-offers" aria-label="All offers">${icon("list")}</button></nav>
       <button type="button" class="route-pill" data-action="edit-route">${icon("plane")}<span>${routeLine(res.r)}</span><b>Edit</b></button>
-      <p class="scan">We checked <b>${n} offer${n === 1 ? "" : "s"}</b> on your ${state.wallet.length} cards for this flight: <span class="s-use">${cnt(["use"])} usable today</span>, <span class="s-catch">${cnt(["catch"])} with a catch</span>, <span class="s-no">${cnt(["blocked","notworth"])} that don't apply</span>.</p>
+      ${res.none ? "" : `<p class="scan"><b>${n} offer${n === 1 ? "" : "s"} checked:</b> <span class="s-use">${cnt(["use"])} usable</span>, <span class="s-catch">${cnt(["catch"])} with a catch</span>, <span class="s-no">${cnt(["blocked","notworth"])} don't apply</span>.</p>`}
       ${res.none ? noneHTML(res) : verdictHTML(res)}
     </div>`;
   },
@@ -1721,7 +1720,7 @@ function recCardHTML(e, res, opts){
         <div class="pay-save"><span class="k">You save</span><span class="big">${inr(e.saving)}</span></div>
         <div class="pay-net"><span class="k">You pay about</span><b>${inr(e.net)}</b><s>${inr(e.fare)}</s></div>
       </div>
-      <p class="adv-line">Advertised <b>${banner(o)}</b><span aria-hidden="true">\u00B7</span>you get <b>${o.kind === "flat" ? inr(e.saving) : pctOf + "%"}</b>${o.kind === "cashback" ? ", paid back later" : ""}</p>
+      <p class="adv-line">${o.kind === "flat" ? `Flat <b>${inr(o.flat)}</b> off` : capped ? `Advertised <b>${o.pct}%</b>, but the ${inr(o.cap)} cap means you get <b>${pctOf}%</b>` : `Full <b>${o.pct}%</b> applies. You're under the ${inr(o.cap)} cap`}${o.kind === "cashback" ? ", paid back later" : ""}.</p>
       ${checksHTML(e)}
       ${opts.noActions ? "" : `<div class="rec-actions">
         <button class="btn" type="button" data-action="use" data-id="${o.id}">Open ${OTAS[o.ota].name} ${icon("arrow-up-right")}</button>
@@ -1730,9 +1729,7 @@ function recCardHTML(e, res, opts){
      </div>
      <aside class="rec-visual" style="--cbg:${C[o.card].bg}" aria-hidden="true">
       <span class="rv-glow"></span><span class="rv-cat">${icon("plane")}</span>
-      <div class="rv-top"><span>${icon("plane-takeoff")} ${routeLabel(res.r)}</span><span>${fmtDay(res.r.date)}</span></div>
       <div class="rv-stage" data-tilt>${cardHTML(o.card)}${otaHTML(o.ota)}</div>
-      <div class="rv-cap"><span>Pay with</span><b>${C[o.card].bank} ${C[o.card].name}</b><span>on ${OTAS[o.ota].name}, booking ${AIRLINES[e.air].name}</span></div>
      </aside>
     </div>
   </article>`;
@@ -1743,7 +1740,7 @@ function verdictHTML(res){
   return `<div class="res-grid">
     <section class="g-main">
       <h1 class="v-h">Pay with <b>${cardFull(o.card)}</b> on ${OTAS[o.ota].name}.</h1>
-      <p class="v-sub">Book <b>${AIRLINES[e.air].name}</b>. You'll pay about <b>${inr(e.net)}</b>, ${inr(vsCheapest)} less than the cheapest fare without an offer (${AIRLINES[res.cheapest.air].name}, ${inr(res.cheapest.fare)}).</p>
+      <p class="v-sub">Book <b>${AIRLINES[e.air].name}</b>. ${res.cheapest.air === e.air ? `It's already the cheapest fare, and this takes ${inr(vsCheapest)} off.` : `It ends up ${inr(vsCheapest)} cheaper than the lowest fare without an offer (${AIRLINES[res.cheapest.air].name}, ${inr(res.cheapest.fare)}).`}</p>
       ${recCardHTML(e, res)}
     </section>
     ${res.catchBest ? catchHTML(res) : ""}
@@ -1759,8 +1756,8 @@ function catchHTML(res){
     <div class="sec-h"><h3>Save more if you can wait</h3></div>
     <button type="button" class="catchc" data-action="open-offer" data-id="${e.o.id}">
       ${pairHTML(e.o)}
-      <span class="catch-v"><b>${inr(e.saving)}</b><span>vs ${inr(res.rec.saving)} today, if the fare holds</span></span>
-      <span class="catch-line">${icon("calendar-clock")}<span><b>${dayRange(e.o.bookDays)}.</b> ${e.unlock}. Fares can rise by then, so this is a bet, not a sure thing.</span></span>
+      <span class="catch-v"><b>${inr(e.saving)}</b><span>vs ${inr(res.rec.saving)} today</span></span>
+      <span class="catch-line">${icon("calendar-clock")}<span>${dayRange(e.o.bookDays)}, so book on <b>${fmtDay(e.catchDay)}</b>. Fares may rise by then.</span></span>
     </button>
   </section>`;
 }
@@ -1774,8 +1771,8 @@ function alsoHTML(res){
       return `<button type="button" class="alt" data-action="open-offer" data-id="${o.id}">
         <span class="alt-k"><span>${role}</span>${certChip(e)}</span>
         ${pairHTML(o)}
-        <span class="alt-v"><b>${inr(e.saving)}</b><span>off, you pay about ${inr(e.net)}</span>${o.kind === "cashback" ? `<span class="chip-later">${icon("clock")} Credited later</span>` : ""}</span>
-        <span class="alt-why">${icon(why ? (why.s === "choice" ? "hand" : "circle-help") : "shield-check")}<span>${why ? `${why.t}. ${why.d}.` : "No limits we can't check."} Book ${AIRLINES[e.air].name}.</span></span>
+        <span class="alt-v"><b>${inr(e.saving)}</b><span>off \u00B7 pay ${inr(e.net)}</span>${o.kind === "cashback" ? `<span class="chip-later">${icon("clock")} Credited later</span>` : ""}</span>
+        <span class="alt-why">${icon(why ? (why.s === "choice" ? "hand" : "circle-help") : "shield-check")}<span>${why ? why.t : "No hidden limits"} \u00B7 ${AIRLINES[e.air].name}</span></span>
       </button>`; }).join(""); })()}</div>
   </section>`;
 }
@@ -1810,7 +1807,7 @@ function missesHTML(res){
   return `<section class="g-miss">
     <div class="sec-h"><h3>Why these don't apply</h3><span class="muted" style="font-size:13px">${res.misses.length} offer${res.misses.length === 1 ? "" : "s"}</span></div>
     <div class="alts miss-alts">${res.misses.map(e => `<button type="button" class="alt alt--miss" data-action="open-offer" data-id="${e.o.id}">
-      <span class="alt-k"><span>${e.status === "catch" ? "Has a catch" : e.status === "notworth" ? "Not worth it" : "Doesn't apply"}</span>${statusChip(e)}</span>
+      ${e.status === "blocked" ? "" : `<span class="alt-k"><span>${e.status === "catch" ? "Has a catch" : "Not worth it"}</span>${statusChip(e)}</span>`}
       ${pairHTML(e.o)}
       <span class="alt-v"><b>${headline(e.o)}</b><span>${e.o.kind === "flat" ? "flat off" : `${e.o.kind === "cashback" ? "cashback" : "off"}, up to ${inr(e.o.cap)}`}</span></span>
       <span class="alt-why">${icon(e.status === "catch" ? "calendar-clock" : e.status === "notworth" ? "scale" : "circle-slash")}<span>${e.fails[0]}</span></span>
@@ -1824,19 +1821,18 @@ function noneHTML(res){
   const n = res.list.length;
   return `<div class="res-grid res-none">
     <section class="g-main none">
-      <span class="none-badge">${icon("circle-slash")} No offer applies</span>
-      <h1 class="v-h">No card offer helps on this flight.</h1>
-      <p class="v-sub">We checked all ${n} offers on your ${state.wallet.length} cards for ${routeLabel(r)} on ${fmtDay(r.date)}. None applies, so you don't need to keep hunting.</p>
+      <h1 class="v-h">None of your cards has an offer for this flight.</h1>
+      <p class="v-sub">We checked all ${n}. You can stop hunting.</p>
       <div class="do-box">
         <div class="label">What we'd do</div>
-        <div class="do-main">${airChip(ch.air)}<b>Book the cheapest fare, about ${inr(ch.fare)}</b></div>
-        <p>Pay with any card. Booking on the airline's own site skips platform convenience fees.</p>
+        <div class="do-main">${airChip(ch.air)}<b>Book ${AIRLINES[ch.air].name} direct, about ${inr(ch.fare)}</b></div>
+        <p>It's the cheapest fare. Any card works, and the airline's site skips platform fees.</p>
         <div class="do-actions">
           <a class="btn" href="${AIRLINES[ch.air].url}" target="_blank" rel="noopener" data-action="airline-out">Open ${AIRLINES[ch.air].name} ${icon("arrow-up-right")}</a>
           <button class="btn ghost" type="button" data-action="alert" aria-pressed="${state.alert}">${icon(state.alert ? "bell-ring" : "bell")} ${state.alert ? "We'll alert you" : "Alert me if an offer appears"}</button>
         </div>
       </div>
-      ${two && two.rec ? `<button type="button" class="tip" data-action="set-pax" data-n="2">${icon("users")}<span><b>Flying with someone?</b> On a booking for 2, ${cardFull(two.rec.o.card)} on ${OTAS[two.rec.o.ota].name} saves about ${inr(two.rec.saving)}. Minimum spends count the whole booking.</span>${icon("arrow-right")}</button>` : ""}
+      ${two && two.rec ? `<button type="button" class="tip" data-action="set-pax" data-n="2">${icon("users")}<span><b>Flying with someone?</b> Book for 2 and ${cardFull(two.rec.o.card)} on ${OTAS[two.rec.o.ota].name} saves about ${inr(two.rec.saving)}.</span>${icon("arrow-right")}</button>` : ""}
       <p class="pos">${icon("info")} We won't suggest getting a new card to save a few hundred rupees on one flight.</p>
     </section>
     ${cardsPanelHTML(res)}
@@ -1955,14 +1951,11 @@ SCREENS.detail = {
       ${e.unlock ? `<p class="miss-fix" style="margin-top:12px">${icon("lightbulb")}${e.unlock}</p>` : ""}
       <details class="cond"><summary>Fine print ${icon("chevron-down")}</summary>
         <ul>
-          <li>Pay the full amount with ${cardFull(o.card)} on ${OTAS[o.ota].name}${o.emi ? " using a 3+ month EMI" : ""}.</li>
-          <li>${o.kind === "flat" ? `Flat ${inr(o.flat)} off` : `${o.pct}% ${o.kind === "cashback" ? "cashback" : "off"}`}, capped at ${inr(maxB(o))} per booking.</li>
-          <li>Minimum booking value ${inr(o.min)}, counted on the total for all travellers.</li>
-          ${o.code ? `<li>Code ${o.code}. Usually applied automatically when you pick the card.</li>` : ""}
-          <li>Valid on bookings made by ${fmtDateLong(o.ends)}.</li>
+          <li>Pay the full amount with ${cardFull(o.card)}${o.emi ? " on a 3+ month EMI" : ""}.</li>
+          ${o.code ? `<li>Code ${o.code}, usually applied for you.</li>` : ""}
+          <li>Prices are estimates from 2 min ago. Sample data for this prototype.</li>
         </ul>
       </details>
-      <p class="lastchk">${icon("refresh-cw")} Last checked 2 min ago. Sample data for this prototype.</p>
       <div style="margin-top:18px">${e.status === "use" ? `<button class="btn block" type="button" data-action="use" data-id="${o.id}">Use this offer ${icon("arrow-up-right")}</button>`
         : e.status === "catch" ? `<button class="btn block" type="button" data-action="remind" data-id="${o.id}">${icon("bell")} Remind me on ${fmtDay(e.catchDay)}</button>`
         : `<button class="btn ghost block" type="button" data-action="back">Back to the recommendation</button>`}</div>
@@ -2007,7 +2000,7 @@ SCREENS.handoff = {
             ${watch.length ? `<div class="watch"><div class="label">Watch out</div>${condsHTML(watch)}</div>` : ""}
           </div>
         </div>
-        <p class="note">${icon("info")} The final price depends on the flight you pick on ${OTAS[o.ota].name}. Fares move, so the saving can too.</p>
+        <p class="note">${icon("info")} Fares move, so your final saving on ${OTAS[o.ota].name} may differ slightly.</p>
         <div class="ho-actions">
           <button class="btn block" type="button" data-action="redirect">Open ${OTAS[o.ota].name} ${icon("arrow-up-right")}</button>
           <button class="btn ghost block" type="button" data-action="copy">${icon("copy")} Copy offer details</button>
