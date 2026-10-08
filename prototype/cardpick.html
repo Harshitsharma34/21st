@@ -253,7 +253,7 @@ p{margin:0}
 .rec-ota .ota{--s:46px;transition:transform .25s var(--ease),filter .25s;filter:saturate(.85)}
 .rec-ota:hover .ota{transform:scale(1.04);filter:none}
 .rec-ota small{display:block;font-size:12.5px;color:var(--ink-2)}
-.rec-ota .ota-name{font-size:16px}
+.rec-ota .ota-name{font-size:16px;display:block}
 .rec-cardslot{position:relative;margin-right:-30px;margin-top:-4px;transition:transform .45s var(--spring)}
 .rec-cardslot .cc{--w:118px;transform:rotate(4deg)}
 .rec:hover .rec-cardslot{transform:translateX(-16px) translateY(-2px)}
@@ -286,18 +286,26 @@ p{margin:0}
 .nextbest .t small{display:block;color:var(--ink-2);font-size:12.5px}
 .why-foot{display:flex;justify-content:flex-end;margin-top:14px}
 .save{margin-top:18px}
-.save-h{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:var(--ink-2)}
-.save-h b{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2);font-weight:650}
-.save-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:10px;align-items:start}
-.sv{display:flex;flex-direction:column;gap:3px;min-width:0}
-.sv small{font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums}
-.sv b{font-size:19px;font-weight:650;letter-spacing:-0.03em;font-variant-numeric:tabular-nums}
-.sv b.no{font-size:13px;font-weight:500;color:var(--muted);letter-spacing:0;padding-block:4px}
-.sv i{display:block;height:3px;border-radius:2px;background:var(--ink);width:var(--p);transform-origin:0 50%;animation:barIn .6s var(--ease) both}
-.sv.full i{background:var(--rec)}
-@keyframes barIn{from{transform:scaleX(0)}}
+.save-h{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2);font-weight:650}
+.save-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:10px;background:var(--soft);border-radius:14px;overflow:hidden}
+.sv{display:flex;flex-direction:column;gap:4px;min-width:0;padding:12px 14px}
+.sv + .sv{border-left:1px solid var(--border)}
+.sv-k{font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sv b{font-size:22px;font-weight:650;letter-spacing:-0.03em;line-height:1.1;font-variant-numeric:tabular-nums}
+.sv-n{font-size:12px;font-weight:600;color:var(--pos)}
+.sv.full .sv-n{color:#1f3dbd}
+.sv.no b{color:var(--muted)}
+.sv.no .sv-n{color:var(--warn)}
+@media (max-width:380px){ .sv{padding:10px} .sv b{font-size:19px} .sv-k{font-size:12px} }
 .rec-visual{display:none;position:relative;flex-direction:column;justify-content:space-between;gap:18px;border-radius:18px;padding:20px;overflow:hidden;background:radial-gradient(110% 70% at 50% 0%, var(--rec-soft) 0%, transparent 70%), var(--soft);isolation:isolate}
 .rv-glow{position:absolute;left:12%;right:12%;top:26%;height:130px;background:var(--cbg);filter:blur(46px);opacity:.28;z-index:-1;border-radius:50%}
+.cat{display:inline-flex;align-items:center;gap:5px;margin-top:4px;padding:3px 8px 3px 6px;border-radius:999px;background:var(--rec-soft);color:#1f3dbd;font-size:12px;font-weight:600;line-height:1.3;width:max-content}
+.cat .i{font-size:13px}
+.cat.sm{margin-top:0;padding:2px 7px 2px 5px;font-size:11px}
+.cat.sm .i{font-size:11.5px}
+.alt-k{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.rv-cat{position:absolute;left:18px;top:44px;font-size:120px;color:#1f3dbd;opacity:.07;transform:rotate(-12deg);pointer-events:none;z-index:-1;line-height:1}
+.rv-cat .i{stroke-width:1.2}
 .rv-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--ink-2)}
 .rv-top span{display:inline-flex;gap:6px;align-items:center}
 .rv-stage{position:relative;flex:1;min-height:210px;display:grid;place-items:center}
@@ -616,7 +624,7 @@ body.has-dock .screen{padding-bottom:190px}
   .wslot.dim{transform:scale(.98)}
   .wslot.addslot{display:block;margin-top:12px}
   .wslot.addslot button{width:100%;height:46px;font-size:14px;gap:6px;display:flex;align-items:center;justify-content:center}
-  .wal-tip{display:none}
+  .wal-tip{margin-top:12px}
   .alts{grid-auto-flow:row;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible;margin-inline:0;padding-inline:0}
   .trip{grid-template-columns:41.5% minmax(0,1fr);grid-template-rows:auto;min-height:290px}
   .trip-l{grid-row:1;grid-column:1;padding:28px 26px 0;min-height:290px}
@@ -844,6 +852,7 @@ function otaHTML(id, s, extra){
   if (id === "emt") return `<span class="ota ota--emt ${extra||""}" ${st} ${t}><svg viewBox="0 0 152 86" aria-hidden="true"><path d="M1 1 L151 12 L113 23 L32 37 Z" fill="#0BB5E0" stroke="#0BB5E0" stroke-width="2" stroke-linejoin="round"/><path d="M41 45 L113 23 L151 13 L77 85 Z" fill="#0BB5E0" stroke="#0BB5E0" stroke-width="2" stroke-linejoin="round"/><path d="M41 47 L54 60 L25 74 Z" fill="#0079B5" stroke="#0079B5" stroke-width="2" stroke-linejoin="round"/></svg></span>`;
   return `<span class="ota ota--yt ${extra||""}" ${st} ${t}><b>y</b></span>`;
 }
+const catChip = (o, cls) => `<span class="cat ${cls||""}">${icon(o.cat === "Flights" ? "plane" : "bed-double")}${o.cat}</span>`;
 const icon = (n, cls) => `<i data-lucide="${n}" class="i ${cls||""}"></i>`;
 const brand = () => `<span class="brand"><span class="brand-mark"><span></span><span></span></span>Cardpick</span>`;
 const logo30 = () => `<span class="logo30" aria-label="30 Sundays"><b>30</b>Sundays</span>`;
@@ -1151,7 +1160,7 @@ SCREENS.home = {
       <section class="g-wallet" aria-label="Explore by card">
         <div class="wal-head"><h3>Explore by card</h3><button type="button" class="wal-add" data-action="go-add">${icon("plus")} Add card</button></div>
         <div class="wallet" id="wallet"></div>
-        <p class="wal-tip">Drag the stack to flip through. Tap the front card for details.</p>
+        <p class="wal-tip">Tap a card to see its best offer. Tap it again for all cards. Press and hold for details.</p>
       </section>
       <section class="g-alts" id="gAlts"></section>
       <section class="g-trip" id="gTrip"></section>
@@ -1170,9 +1179,14 @@ function modesHTML(){
 }
 function saveHTML(o){
   const amts = [5000, 10000, 20000];
-  const vals = amts.map(a => benefit(o, a));
-  return `<div class="save"><div class="save-h"><b>What you'd save</b><span>by booking value</span></div>
-    <div class="save-row">${amts.map((a,i) => `<div class="sv ${vals[i] && vals[i] >= maxB(o) ? "full" : ""}"><small>${k(a)} booking</small>${vals[i] ? `<b>${inr(vals[i])}</b>` : `<b class="no">Below ${k(o.min)} min</b>`}<i style="--p:${vals[i] ? Math.max(8, vals[i] / maxB(o) * 100) : 0}%"></i></div>`).join("")}</div></div>`;
+  const rate = o.kind === "flat" ? `Flat ${inr(o.flat)} off` : `${o.pct}% ${o.kind === "cashback" ? "cashback" : "off"}`;
+  return `<div class="save"><div class="save-h">What you'd save</div>
+    <div class="save-row">${amts.map(a => {
+      const v = benefit(o, a);
+      const st = !v ? "no" : v >= maxB(o) ? "full" : "";
+      const note = !v ? `Needs ${inr(o.min)}+` : v >= maxB(o) ? "Max saving" : rate;
+      return `<div class="sv ${st}"><span class="sv-k">On ${inr(a)}</span><b>${v ? inr(v) : "\u20B90"}</b><span class="sv-n">${note}</span></div>`;
+    }).join("")}</div></div>`;
 }
 function recHTML(o, opts){
   opts = opts || {};
@@ -1196,13 +1210,12 @@ function recHTML(o, opts){
     <div class="rec-body" id="recBody">
      <div class="rec-info">
       <div class="rec-row">
-        <div class="rec-ota">${otaHTML(o.ota)}<div><span class="ota-name">${OTAS[o.ota].name}</span><small>${o.cat}</small></div></div>
+        <div class="rec-ota">${otaHTML(o.ota)}<div><span class="ota-name">${OTAS[o.ota].name}</span>${catChip(o)}</div></div>
         <div class="rec-cardslot">${cardHTML(o.card)}</div>
       </div>
       <div class="rec-benefit"><span class="big">${headline(o)}</span><span class="big-u">${unitLabel(o).replace(" ","<br>")}</span></div>
       <p class="cap">Up to <b class="num">${inr(maxB(o))}</b>${o.kind === "cashback" ? ` <span class="chip-later">${icon("clock")} Credited later</span>` : ""}</p>
       ${saveHTML(o)}
-      <p class="use-line">${icon("credit-card")} Use <b>${cardFull(o.card)}</b></p>
       <dl class="facts">
         <div><dt>Min spend</dt><dd>${inr(o.min)}</dd></div>
         <div><dt>Applies to</dt><dd>${o.scope.replace("Domestic and international","All")}</dd></div>
@@ -1229,7 +1242,7 @@ function recHTML(o, opts){
       ${state.filter === "all" ? `<div class="swipe-hint" aria-hidden="true">${["best","spend","cash"].filter(m => m !== "cash" || picks().cash).map(m => `<i class="${state.mode === m ? "on" : ""}"></i>`).join("")}</div>` : ""}
      </div>
      <aside class="rec-visual" style="--cbg:${C[o.card].bg}" aria-hidden="true">
-      <span class="rv-glow"></span>
+      <span class="rv-glow"></span><span class="rv-cat">${icon(o.cat === "Flights" ? "plane" : "bed-double")}</span>
       <div class="rv-top"><span>${icon("refresh-cw")} Checked 2 min ago</span><span>${daysLeft(o) <= 10 ? daysLeft(o) + " days left" : "Until " + fmtDate(o.ends)}</span></div>
       <div class="rv-stage" data-tilt>${cardHTML(o.card)}${otaHTML(o.ota)}</div>
       <div class="rv-cap"><span>Pay with</span><b>${C[o.card].bank} ${C[o.card].name}</b><span>on ${OTAS[o.ota].name}, ${o.cat.toLowerCase()}</span></div>
@@ -1278,9 +1291,8 @@ function walletOrder(){ return state.wallet.slice(); }
 function drawWallet(){
   const w = document.getElementById("wallet"); if (!w) return;
   const ids = walletOrder();
-  w.innerHTML = `<div class="wslot allslot ${state.filter === "all" ? "active" : "dim"}" style="z-index:1"><button type="button" class="wall" data-action="filter" data-id="all" aria-pressed="${state.filter === "all"}"><span class="stk"><i></i><i></i><i></i></span><span>All my cards</span></button></div>`
-    + ids.map((id,i) => `<div class="wslot ${state.filter === id ? "active" : state.filter === "all" ? "" : "dim"}" style="z-index:${i+2}" data-slot="${id}">
-        <button type="button" data-action="wcard" data-id="${id}" aria-pressed="${state.filter === id}" aria-label="${cardFull(id)}${state.filter === id ? ", selected. Activate for details" : ""}">${cardHTML(id)}</button></div>`).join("")
+  w.innerHTML = ids.map((id,i) => `<div class="wslot ${state.filter === id ? "active" : state.filter === "all" ? "" : "dim"}" style="z-index:${i+2}" data-slot="${id}">
+        <button type="button" data-action="wcard" data-id="${id}" aria-pressed="${state.filter === id}" aria-label="${cardFull(id)}${state.filter === id ? ", selected. Activate to show all cards" : ""}">${cardHTML(id)}</button></div>`).join("")
     + `<div class="wslot addslot"><button type="button" data-action="go-add" aria-label="Add a card">${icon("plus")}<span class="addtxt">Add card</span></button></div>`;
   paint();
   bindWalletDrag(w);
@@ -1326,7 +1338,7 @@ function setFilter(id, fromDrag){
 }
 function altHTML(o, label, why){
   return `<button type="button" class="alt" data-action="open-offer" data-id="${o.id}">
-    <span class="alt-k">${label}</span>
+    <span class="alt-k"><span>${label}</span>${catChip(o, "sm")}</span>
     <span class="alt-pair">${cardHTML(o.card)}<span>${cardFull(o.card)}</span><span class="x">×</span>${otaHTML(o.ota)}<span>${OTAS[o.ota].name}</span></span>
     <span class="alt-v"><b>${headline(o)}</b><span>${unitLabel(o)}, up to ${inr(maxB(o))}</span>${o.kind === "cashback" ? `<span class="chip-later">${icon("clock")} Credited later</span>` : ""}</span>
     <span class="alt-why">${icon("info")}<span>${why}</span></span>
@@ -1429,7 +1441,7 @@ function drawRows(){
     return `<button type="button" class="row" data-action="open-offer" data-id="${o.id}">
       ${otaHTML(o.ota)}
       <span class="row-main">
-        <span class="o">${OTAS[o.ota].name} · ${o.cat} ${tag}</span>
+        <span class="o">${OTAS[o.ota].name} ${catChip(o, "sm")} ${tag}</span>
         <span class="v">${headline(o)} ${unitLabel(o)} <span>up to ${inr(maxB(o))}</span></span>
         <span class="row-meta mob">${cardHTML(o.card,{mini:true})}${cardFull(o.card)}</span>
         <span class="row-meta mob">Min ${k(o.min)} · Ends ${fmtDate(o.ends)}</span>
@@ -1712,7 +1724,7 @@ document.addEventListener("click", e => {
     case "filter": setFilter(id); break;
     case "wcard": {
       const w = document.getElementById("wallet"); if (w && w._suppress) return;
-      if (state.filter === id) openCardSheet(id); else setFilter(id);
+      setFilter(state.filter === id ? "all" : id);
       break; }
     case "filter-close": closeSheet(); setFilter(id); break;
     case "remove-card":
