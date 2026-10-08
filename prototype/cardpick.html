@@ -1205,6 +1205,12 @@ body,.rec,.alt,.cd,.btn,.iconbtn,.route-pill{transition:background-color .25s,bo
   .stackw .wslot:first-child{margin-left:0 !important}
   .stackw .wslot.active + .wslot{margin-left:8px !important}
 }
+
+/* clicked card comes to the front of the stack */
+.stackw .wslot.active + .wslot{margin-top:inherit}
+@media (min-width:900px){ .stackw .wslot:not(:first-child){margin-top:calc(-63.05% + 48px) !important} }
+@media (max-width:899px){ .stackw .wslot:not(:first-child){margin-left:-82px !important} }
+.stackw .wslot{transition:none}
 </style>
 
 <div id="app" aria-live="polite"></div>
@@ -1985,10 +1991,15 @@ function cardsPanelHTML(res){
   const sel = walletSel(res);
   return `<section class="g-cards" aria-label="Your cards for this flight">
     <div class="wal-head"><h3>Your cards for this flight</h3><button type="button" class="wal-add" data-action="go-add">${icon("pencil")} Edit</button></div>
-    <div class="wallet stackw" id="wallet">${state.wallet.map((id, i) => { const st = cardStatus(id, res); return `<div class="wslot ${id === sel ? "active" : ""}" style="z-index:${i + 1}" data-slot="${id}">
-      <button type="button" data-action="wsel" data-id="${id}" aria-pressed="${id === sel}" aria-label="${cardFull(id)}: ${st.t}">${cardHTML(id)}<span class="ws-dot ws-dot--${st.k}" aria-hidden="true"></span></button></div>`; }).join("")}</div>
+    <div class="wallet stackw" id="wallet">${walletStackHTML(res)}</div>
     <div class="ws-detail" id="wsDetail" aria-live="polite">${wsDetailHTML(sel, res)}</div>
   </section>`;
+}
+function walletOrder2(sel){ return state.wallet.filter(id => id !== sel).concat(sel); }
+function walletStackHTML(res){
+  const sel = walletSel(res);
+  return walletOrder2(sel).map((id, i) => { const st = cardStatus(id, res); return `<div class="wslot ${id === sel ? "active" : ""}" style="z-index:${i + 1}" data-slot="${id}">
+      <button type="button" data-action="wsel" data-id="${id}" aria-pressed="${id === sel}" aria-label="${cardFull(id)}: ${st.t}">${cardHTML(id)}<span class="ws-dot ws-dot--${st.k}" aria-hidden="true"></span></button></div>`; }).join("");
 }
 function missesHTML(res){
   if (!res.misses.length) return "";
@@ -2393,9 +2404,18 @@ document.addEventListener("click", e => {
     case "route-go": track("route_selected", { route: routeLabel(state.route), date: fmtDay(state.route.date), pax: state.route.pax }); go(state.wallet.length ? "matching" : "add"); break;
     case "card-sheet": openCardSheet(id); break;
     case "wsel": {
-      if (state.wsel === id || (!state.wsel && walletSel(state.res) === id)) { openCardSheet(id); break; }
+      if (walletSel(state.res) === id) { openCardSheet(id); break; }
       state.wsel = id; track("card_filter_changed", { card: id });
-      document.querySelectorAll("#wallet .wslot").forEach(w => { const on = w.dataset.slot === id; w.classList.toggle("active", on); w.querySelector("button").setAttribute("aria-pressed", String(on)); });
+      const wl = document.getElementById("wallet");
+      const before = {}; wl.querySelectorAll(".wslot").forEach(w => before[w.dataset.slot] = w.getBoundingClientRect());
+      wl.innerHTML = walletStackHTML(state.res); paint();
+      if (!reduce) wl.querySelectorAll(".wslot").forEach(w => {
+        const a = before[w.dataset.slot], b2 = w.getBoundingClientRect(); if (!a) return;
+        const dx = a.left - b2.left, dy = a.top - b2.top;
+        const front = w.dataset.slot === id;
+        w.animate(front ? [{ transform:`translate(${dx}px,${dy}px)` },{ transform:`translate(${dx*0.4}px,${dy*0.4 - 24}px) scale(1.04)`, offset:.45 },{ transform:"none" }]
+                        : [{ transform:`translate(${dx}px,${dy}px)` },{ transform:"none" }], { duration: front ? 520 : 420, easing:"cubic-bezier(.2,.8,.2,1)" });
+      });
       const d = document.getElementById("wsDetail"); d.innerHTML = wsDetailHTML(id, state.res); paint();
       if (!reduce) d.animate([{ opacity:0, transform:"translateY(6px)" },{ opacity:1, transform:"none" }], { duration:260, easing:"cubic-bezier(.2,.8,.2,1)" });
       break; }
