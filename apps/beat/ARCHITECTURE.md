@@ -2,6 +2,8 @@
 
 Predictive travel intelligence for one question: will this place be worth it on these dates? The map is the product. Scores are momentum, not fame. Every number is labelled with what kind of evidence it is.
 
+The pickup doc for the current code, known traps, and the next backend increment is `HANDOFF.md` at the repo root. This file is the design. That file is the state.
+
 ## A. Architecture
 
 ```
