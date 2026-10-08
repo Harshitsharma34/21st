@@ -2,7 +2,7 @@
 <meta name="description" content="Which card to pay with, on which platform, for your flight, and what you will actually save.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=Pacifico&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=Pacifico&family=Permanent+Marker&display=swap">
 <style>
 /* Layout: mobile-first single column (390px target); desktop home becomes an asymmetric 1fr / 360px split with the wallet as a side rail. */
 :root{
@@ -1113,6 +1113,21 @@ main.screen[data-screen="landing"]::before{content:"";position:absolute;left:0;r
 main.screen[data-screen="landing"]::after{content:"";position:absolute;left:0;right:0;top:0;height:min(900px,100%);z-index:-1;pointer-events:none;
   background-image:radial-gradient(rgba(255,255,255,.075) 1px, transparent 1.3px);background-size:22px 22px;
   -webkit-mask-image:radial-gradient(70% 60% at 70% 30%,#000 0%,rgba(0,0,0,.4) 55%,transparent 85%);mask-image:radial-gradient(70% 60% at 70% 30%,#000 0%,rgba(0,0,0,.4) 55%,transparent 85%)}
+
+/* handoff: card flies into the logo, the intro rises and fades, then a graffiti tag is sprayed onto the card */
+.ho-anim{animation:hoUp .45s 1.05s cubic-bezier(.5,0,.75,0) forwards}
+@keyframes hoUp{to{opacity:0;transform:translateY(-28px);height:0;margin:0}}
+.remember{position:relative}
+.graffiti{position:absolute;right:2%;top:-14px;z-index:4;pointer-events:none;transform-origin:20% 60%;animation:gPop .6s 2.15s var(--spring) both}
+.g-tag{display:block;font-family:"Permanent Marker","Marker Felt","Comic Sans MS",cursive;font-size:36px;line-height:1;color:var(--rec);transform:rotate(-9deg);letter-spacing:.01em;
+  text-shadow:0 0 1px #ffe9c4,1px 1px 0 rgba(255,233,196,.55),0 0 14px rgba(204,145,102,.55),0 0 26px rgba(204,145,102,.25)}
+.g-drip{position:absolute;left:38%;top:30px;width:3px;height:0;border-radius:0 0 3px 3px;background:var(--rec);animation:gDrip .9s 2.6s ease-out forwards}
+.graffiti i{position:absolute;left:0;top:0;width:var(--s);height:var(--s);border-radius:50%;background:var(--rec);transform:translate(var(--x),var(--y)) scale(0);opacity:.85;animation:gDot .4s 2.3s var(--spring) forwards}
+.graffiti i:nth-of-type(even){background:#ffe9c4;opacity:.7;animation-delay:2.38s}
+@keyframes gPop{0%{opacity:0;transform:scale(.2) rotate(-18deg)}60%{opacity:1;transform:scale(1.18) rotate(4deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes gDrip{to{height:16px}}
+@keyframes gDot{to{transform:translate(var(--x),var(--y)) scale(1)}}
+@media (max-width:420px){ .g-tag{font-size:31px} .graffiti{top:-22px;right:7%} }
 </style>
 
 <div id="app" aria-live="polite"></div>
@@ -2076,22 +2091,18 @@ SCREENS.handoff = {
     const watch = e.conds.filter(c => c.s === "unknown" || c.s === "choice");
     return `<div class="ho">
       <nav class="bar"><button class="iconbtn" type="button" data-action="back" aria-label="Back">${icon("arrow-left")}</button>${brand()}<span style="width:40px"></span></nav>
-      <div class="graf" aria-hidden="true">
-        <svg viewBox="0 0 320 130" width="320" height="130">
-          <path class="graf-under" pathLength="1" d="M24 100 C 60 40, 96 30, 116 66 C 132 96, 98 108, 92 84 C 86 60, 140 34, 184 52 C 220 66, 240 70, 262 58"/>
-          <path class="graf-line" pathLength="1" d="M24 100 C 60 40, 96 30, 116 66 C 132 96, 98 108, 92 84 C 86 60, 140 34, 184 52 C 220 66, 240 70, 262 58"/>
-          <path class="graf-hi" pathLength="1" d="M24 100 C 60 40, 96 30, 116 66 C 132 96, 98 108, 92 84 C 86 60, 140 34, 184 52 C 220 66, 240 70, 262 58"/>
-          <g class="graf-dots"><circle cx="248" cy="40" r="3"/><circle cx="256" cy="80" r="2"/><circle cx="236" cy="66" r="1.6"/><circle cx="270" cy="32" r="1.8"/><circle cx="226" cy="44" r="1.3"/><circle cx="30" cy="112" r="1.6"/><circle cx="16" cy="96" r="1.2"/></g>
-        </svg>
-        <span class="graf-card">${cardHTML(o.card)}</span>
-        <span class="graf-ota">${otaHTML(o.ota)}</span>
-      </div>
+      <div class="ho-anim" id="hoAnim" aria-hidden="true">${cardHTML(o.card)}${otaHTML(o.ota)}</div>
       <div id="hoBody" class="ho-body">
         <div class="ho-ready">${icon("check")} Ready</div>
         <h1>You're heading to ${OTAS[o.ota].name}</h1>
         <div class="label" style="margin-top:26px">Remember to pay with</div>
         <div class="remember">
           <div class="tiltw sway" data-tilt id="hoCard">${cardHTML(o.card)}</div>
+          <div class="graffiti" aria-hidden="true">
+            <span class="g-tag">${inr(e.saving)} off!</span>
+            <span class="g-drip"></span>
+            <i style="--x:-14px;--y:-10px;--s:7px"></i><i style="--x:8px;--y:-18px;--s:4px"></i><i style="--x:118px;--y:2px;--s:6px"></i><i style="--x:128px;--y:34px;--s:4px"></i><i style="--x:-6px;--y:40px;--s:3px"></i><i style="--x:96px;--y:-14px;--s:3px"></i>
+          </div>
           <div class="remember-box">
             <div class="label">Your offer</div>
             <div class="v">Save about ${inr(e.saving)}</div>
@@ -2113,7 +2124,15 @@ SCREENS.handoff = {
       </div>
     </div>`;
   },
-  mount(){ track("handoff_viewed", { offer: state.sel.o.id }); }
+  mount(el){
+    track("handoff_viewed", { offer: state.sel.o.id });
+    const a = el.querySelector("#hoAnim"), cc = a.querySelector(".cc"), ota = a.querySelector(".ota");
+    if (reduce) return;
+    const or = ota.getBoundingClientRect(), cr = cc.getBoundingClientRect();
+    const d = (or.left + or.width / 2) - (cr.left + cr.width / 2);
+    cc.animate([{ transform:"translateX(0) scale(1) rotate(0)" },{ transform:`translateX(${d*0.55}px) scale(.7) rotate(-8deg)`, offset:.6 },{ transform:`translateX(${d}px) scale(.42) rotate(0)`, opacity:0 }], { duration:820, easing:"cubic-bezier(.5,0,.2,1)", fill:"forwards" });
+    ota.animate([{ transform:"scale(1)" },{ transform:"scale(1)", offset:.75 },{ transform:"scale(1.14)" },{ transform:"scale(1)" }], { duration:1050, easing:"ease-out" });
+  }
 };
 SCREENS.redirect = {
   html: () => {
