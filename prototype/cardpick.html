@@ -1211,6 +1211,19 @@ body,.rec,.alt,.cd,.btn,.iconbtn,.route-pill{transition:background-color .25s,bo
 @media (min-width:900px){ .stackw .wslot:not(:first-child){margin-top:calc(-63.05% + 48px) !important} }
 @media (max-width:899px){ .stackw .wslot:not(:first-child){margin-left:-82px !important} }
 .stackw .wslot{transition:none}
+
+/* other offers + misses: same grid, same card anatomy, links on the same right edge */
+@media (min-width:900px){
+  .res-grid{grid-template-areas:"main cards" "catch cards" "also also" "miss miss" "trip trip"}
+  .g-also .alts,.g-miss .alts{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+.alt--miss .alt-k > span:first-child{display:inline}
+.alt-k > span:first-child{white-space:nowrap}
+.alt{height:100%}
+.alt .alt-why{margin-top:auto}
+.sec-h{align-items:center}
+.sec-h .link,.miss-tog{margin-left:auto}
+.miss-d > summary.sec-h{display:flex}
 </style>
 
 <div id="app" aria-live="polite"></div>
@@ -2007,7 +2020,7 @@ function missesHTML(res){
     <details class="miss-d" id="missD">
     <summary class="sec-h miss-sum"><h3>${res.misses.length} offer${res.misses.length === 1 ? " doesn't" : "s don't"} fit this flight</h3><span class="miss-tog">See why ${icon("chevron-down")}</span></summary>
     <div class="alts miss-alts">${res.misses.map(e => `<button type="button" class="alt alt--miss" data-action="open-offer" data-id="${e.o.id}">
-      ${e.status === "blocked" ? "" : `<span class="alt-k"><span>${e.status === "catch" ? "Has a catch" : "Not worth it"}</span>${statusChip(e)}</span>`}
+      <span class="alt-k"><span>${e.status === "catch" ? "Has a catch" : e.status === "notworth" ? "Not worth it" : /^Needs/.test(e.fails[0]) ? "Below the minimum" : /International/.test(e.fails[0]) ? "International only" : "Airline not covered"}</span>${statusChip(e)}</span>
       ${pairHTML(e.o)}
       <span class="alt-v"><b>${headline(e.o)}</b><span>${e.o.kind === "flat" ? "flat off" : `${e.o.kind === "cashback" ? "cashback" : "off"}, up to ${inr(e.o.cap)}`}</span></span>
       <span class="alt-why">${icon(e.status === "catch" ? "calendar-clock" : e.status === "notworth" ? "scale" : "circle-slash")}<span>${e.fails[0]}</span></span>
