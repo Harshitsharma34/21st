@@ -993,6 +993,49 @@ h1,.v-h,.rt-h,.add-head h1,.land-hero h1,.ad-copy h2,.ho h1,.st-h,.trip h3,.prev
 .head--choice .hd-i{color:var(--mist);box-shadow:inset 0 0 0 1px rgba(172,175,185,.45)}.head--choice em{color:var(--mist)}
 .head--fail .hd-i{color:var(--danger);box-shadow:inset 0 0 0 1px rgba(227,146,138,.45)}.head--fail em{color:var(--danger)}
 .rec .rec-actions{margin-top:22px}
+
+/* misses as cards (earlier card language) */
+.alt--miss .alt-k > span:first-child{display:none}
+.alt--miss .alt-v b{color:var(--mist)}
+.alt--miss .alt-why{color:var(--danger)}
+.alt--miss .alt-why .i{color:var(--danger)}
+.alt-fix{display:flex;gap:7px;align-items:flex-start;font-size:13px;color:var(--rec);margin-top:-4px}
+.alt-fix .i{flex:none;margin-top:2px}
+.alt-why .i{flex:none;margin-top:2px}
+@media (min-width:900px){ .miss-alts{grid-template-columns:repeat(3,minmax(0,1fr))} }
+/* subtle atmosphere on results, all offers and offer detail */
+main.screen[data-screen="home"],main.screen[data-screen="detail"],main.screen[data-screen="offers"]{position:relative;isolation:isolate}
+main.screen[data-screen="home"]::before,main.screen[data-screen="detail"]::before,main.screen[data-screen="offers"]::before{content:"";position:absolute;left:0;right:0;top:0;height:min(1100px,100%);z-index:-1;pointer-events:none;
+  background:radial-gradient(55% 38% at 82% 0%, rgba(204,145,102,.16), transparent 72%),radial-gradient(45% 30% at 6% 8%, rgba(255,240,204,.06), transparent 70%)}
+main.screen[data-screen="home"]::after,main.screen[data-screen="detail"]::after,main.screen[data-screen="offers"]::after{content:"";position:absolute;left:0;right:0;top:0;height:min(900px,100%);z-index:-1;pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,.07) 1px, transparent 1.3px);background-size:22px 22px;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.5) 35%,transparent 85%);mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.5) 35%,transparent 85%)}
+
+/* stacked wallet for "Your cards for this flight" */
+.stackw{height:auto;padding-top:16px;cursor:default;overflow:visible}
+.stackw .wslot > button{display:block;position:relative;border-radius:8px}
+.ws-dot{position:absolute;top:7px;right:7px;width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 2px rgba(0,0,0,.55);z-index:3}
+.ws-dot--best,.ws-dot--use{background:var(--pos)}.ws-dot--catch{background:var(--warn)}.ws-dot--no{background:var(--danger)}.ws-dot--none{background:var(--steel)}
+.ws-detail{margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+.ws-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.ws-h b{font-size:16px;font-weight:500;color:var(--ink)}
+.ws-s{font-size:12px;font-weight:500;padding:2px 9px;border-radius:9999px;border:1px solid currentColor;white-space:nowrap}
+.ws-s--best{color:var(--ink)}.ws-s--use{color:var(--pos)}.ws-s--catch{color:var(--warn)}.ws-s--no{color:var(--danger)}.ws-s--none{color:var(--steel)}
+.ws-detail p{margin-top:6px;font-size:13.5px;color:var(--ink-2);line-height:1.45}
+.ws-detail .link{margin-top:10px}
+@media (max-width:899px){
+  .stackw{height:112px;display:flex;align-items:flex-end}
+  .stackw .wslot .cc{--w:118px}
+  .stackw .wslot{margin-left:-80px}
+  .stackw .wslot:first-child{margin-left:0}
+  .stackw .wslot.active + .wslot{margin-left:-30px}
+}
+@media (min-width:900px){
+  .stackw .wslot{margin-top:-128px}
+  .stackw .wslot:first-child{margin-top:0}
+  .stackw .wslot.active + .wslot{margin-top:-28px}
+  .res-grid .g-cards .wal-add{display:inline-flex}
+}
 </style>
 
 <div id="app" aria-live="polite"></div>
@@ -1208,7 +1251,7 @@ const state = {
   screen: "ad", hist: [],
   wallet: store.get("wallet", []),
   route: { from: "DEL", to: "BOM", date: D(10,16), pax: 1 },
-  res: null, sel: null, cat: "all", expired: [], alert: false, deadEval: null,
+  res: null, sel: null, wsel: null, cat: "all", expired: [], alert: false, deadEval: null,
   trip: { vibe: null, opt: null, saved: false }
 };
 const timers = [];
@@ -1746,26 +1789,32 @@ function cardStatus(id, res){
   if (c) return { k: "catch", t: "Has a catch", d: dayRange(c.o.bookDays) };
   return { k: "no", t: "Doesn't apply", d: evs[0].fails[0] };
 }
+function walletSel(res){ return state.wsel && state.wallet.includes(state.wsel) ? state.wsel : (res.rec ? res.rec.o.card : state.wallet[0]); }
+function wsDetailHTML(id, res){
+  const st = cardStatus(id, res);
+  return `<div class="ws-h"><b>${cardFull(id)}</b><span class="ws-s ws-s--${st.k}">${st.t}</span></div>
+    <p>${st.d}</p>
+    <button type="button" class="link" data-action="card-sheet" data-id="${id}">See this card's offers ${icon("arrow-right")}</button>`;
+}
 function cardsPanelHTML(res){
+  const sel = walletSel(res);
   return `<section class="g-cards" aria-label="Your cards for this flight">
     <div class="wal-head"><h3>Your cards for this flight</h3><button type="button" class="wal-add" data-action="go-add">${icon("pencil")} Edit</button></div>
-    <div class="cardlist">${state.wallet.map(id => { const s = cardStatus(id, res); return `<button type="button" class="cl-row cl--${s.k}" data-action="card-sheet" data-id="${id}">
-      ${cardHTML(id)}
-      <span class="cl-t"><b>${cardFull(id)}</b><small>${s.d}</small></span>
-      <span class="cl-s">${s.t}</span>
-    </button>`; }).join("")}</div>
+    <div class="wallet stackw" id="wallet">${state.wallet.map((id, i) => { const st = cardStatus(id, res); return `<div class="wslot ${id === sel ? "active" : ""}" style="z-index:${i + 1}" data-slot="${id}">
+      <button type="button" data-action="wsel" data-id="${id}" aria-pressed="${id === sel}" aria-label="${cardFull(id)}: ${st.t}">${cardHTML(id)}<span class="ws-dot ws-dot--${st.k}" aria-hidden="true"></span></button></div>`; }).join("")}</div>
+    <div class="ws-detail" id="wsDetail" aria-live="polite">${wsDetailHTML(sel, res)}</div>
   </section>`;
 }
 function missesHTML(res){
   if (!res.misses.length) return "";
   return `<section class="g-miss">
     <div class="sec-h"><h3>Why these don't apply</h3><span class="muted" style="font-size:13px">${res.misses.length} offer${res.misses.length === 1 ? "" : "s"}</span></div>
-    <div class="miss-list">${res.misses.map(e => `<button type="button" class="miss" data-action="open-offer" data-id="${e.o.id}">
-      ${otaHTML(e.o.ota)}
-      <span class="miss-t"><b>${cardFull(e.o.card)} on ${OTAS[e.o.ota].name}</b><span class="muted">${banner(e.o)}</span>
-        <span class="miss-why">${icon(e.status === "catch" ? "calendar-clock" : e.status === "notworth" ? "scale" : "circle-slash")}${e.fails[0]}</span>
-        ${e.unlock ? `<span class="miss-fix">${icon("lightbulb")}${e.unlock}</span>` : ""}
-      </span>
+    <div class="alts miss-alts">${res.misses.map(e => `<button type="button" class="alt alt--miss" data-action="open-offer" data-id="${e.o.id}">
+      <span class="alt-k"><span>${e.status === "catch" ? "Has a catch" : e.status === "notworth" ? "Not worth it" : "Doesn't apply"}</span>${statusChip(e)}</span>
+      ${pairHTML(e.o)}
+      <span class="alt-v"><b>${headline(e.o)}</b><span>${e.o.kind === "flat" ? "flat off" : `${e.o.kind === "cashback" ? "cashback" : "off"}, up to ${inr(e.o.cap)}`}</span></span>
+      <span class="alt-why">${icon(e.status === "catch" ? "calendar-clock" : e.status === "notworth" ? "scale" : "circle-slash")}<span>${e.fails[0]}</span></span>
+      ${e.unlock ? `<span class="alt-fix">${icon("lightbulb")}<span>${e.unlock}</span></span>` : ""}
     </button>`).join("")}</div>
   </section>`;
 }
@@ -2160,6 +2209,13 @@ document.addEventListener("click", e => {
     case "pax": state.route.pax = Math.min(6, Math.max(1, state.route.pax + (+b.dataset.d))); document.getElementById("paxN").textContent = state.route.pax; break;
     case "route-go": track("route_selected", { route: routeLabel(state.route), date: fmtDay(state.route.date), pax: state.route.pax }); go(state.wallet.length ? "matching" : "add"); break;
     case "card-sheet": openCardSheet(id); break;
+    case "wsel": {
+      if (state.wsel === id || (!state.wsel && walletSel(state.res) === id)) { openCardSheet(id); break; }
+      state.wsel = id; track("card_filter_changed", { card: id });
+      document.querySelectorAll("#wallet .wslot").forEach(w => { const on = w.dataset.slot === id; w.classList.toggle("active", on); w.querySelector("button").setAttribute("aria-pressed", String(on)); });
+      const d = document.getElementById("wsDetail"); d.innerHTML = wsDetailHTML(id, state.res); paint();
+      if (!reduce) d.animate([{ opacity:0, transform:"translateY(6px)" },{ opacity:1, transform:"none" }], { duration:260, easing:"cubic-bezier(.2,.8,.2,1)" });
+      break; }
     case "remove-card":
       state.wallet = state.wallet.filter(x => x !== id); store.set("wallet", state.wallet);
       track("card_removed", { card: id }); closeSheet(true);
