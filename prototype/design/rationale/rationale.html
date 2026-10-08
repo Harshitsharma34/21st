@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cardpick: How and Why</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Serif+Display&display=swap">
+<style>
+  @page { size: A4; margin: 15mm 16mm 16mm; }
+  :root { --ink:#121214; --body:#2b2c31; --ink-2:#5b5e69; --rule:#e4e2dc; --copper:#9a5a2a; --tint:#f8efe5; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font-family: "Inter", system-ui, sans-serif; font-size: 9.6pt; line-height: 1.5; color: var(--body); }
+  h1 { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; font-size: 27pt; line-height: 1.05; color: var(--ink); margin: 0; letter-spacing: .01em; }
+  h2 { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; font-size: 15pt; color: var(--ink); margin: 0 0 5pt; letter-spacing: .01em; }
+  p { margin: 0 0 6pt; }
+  .meta { font-size: 8.5pt; color: var(--ink-2); margin-top: 6pt; }
+  .lead { font-size: 11pt; line-height: 1.45; color: var(--ink); margin: 12pt 0 4pt; max-width: 150mm; }
+  section { display: grid; grid-template-columns: minmax(0, 1fr) 46mm; gap: 7mm; padding-top: 9pt; margin-top: 9pt; border-top: 1px solid var(--rule); }
+  figure, .call, li { break-inside: avoid; }
+  h2 { break-after: avoid; }
+  section.wide { grid-template-columns: 1fr; break-inside: avoid; }
+  section.nofig { grid-template-columns: 1fr; }
+  .call { background: var(--tint); border-left: 2.5pt solid var(--copper); padding: 6pt 9pt; margin: 6pt 0; border-radius: 0 3pt 3pt 0; }
+  .call b, ul b { color: var(--ink); font-weight: 600; }
+  ul { margin: 4pt 0 2pt; padding-left: 12pt; }
+  li { margin: 0 0 3.5pt; }
+  figure { margin: 0; }
+  figure img { display: block; width: 100%; border-radius: 6pt; border: 1px solid #d9d7d0; }
+  figcaption { font-size: 7.6pt; line-height: 1.4; color: var(--ink-2); margin-top: 4pt; }
+  .figs { display: grid; gap: 4mm; align-content: start; }
+  .row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm; margin-top: 8pt; padding: 0 14mm; }
+  .row3 img { max-height: 66mm; object-fit: cover; object-position: top; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+  .tall img { max-height: 88mm; object-fit: cover; object-position: top; }
+  .num { font-variant-numeric: tabular-nums; }
+  ol { margin: 4pt 0 0; padding-left: 14pt; }
+</style>
+</head>
+<body>
+
+<h1>Cardpick: How and Why</h1>
+<div class="meta">Design rationale · Harshit Sharma · October 2026</div>
+<p class="lead">Cardpick tells you which card to pay with, and where to book, for one specific flight. Every offer is judged on the fare you will actually pay, never on the number printed on the banner.</p>
+
+<section>
+  <div>
+    <h2>The problem I wanted to solve</h2>
+    <p>Flight offers are spread across bank sites, OTAs and airlines, and each one carries its own rules. Most people hold three to six cards and still book without knowing which one to use. The biggest discount on a banner is often not the cheapest ticket once caps, minimum spends and airline exclusions come into play.</p>
+    <div class="call"><b>One answer first.</b> The screen opens with a single recommendation. Other offers are there for anyone who wants to compare, but nobody has to compare to get an answer.</div>
+    <div class="call"><b>Compare final prices.</b> Each offer is priced on the real fare, after its cap, its airline rules and its minimum spend.</div>
+    <ul><li><b>Keep booking where it belongs.</b> Cardpick finds the offer and hands over to the travel site. It never takes the booking.</li></ul>
+  </div>
+  <div class="figs tall">
+    <figure><img src="recommendation.png" alt="Recommendation screen: Pay with HDFC Regalia on MakeMyTrip, save ₹776, pay about ₹5,694"><figcaption>The answer is the headline. Card, platform and airline come first, then what you save and what you pay.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div>
+    <h2>How I chose the best offer</h2>
+    <p>The hardest call in this brief is that the offer saving the most is often the one least likely to work. I rank on the price someone will probably pay, and I show the catch instead of burying it.</p>
+    <div class="call"><b>Rank by final fare.</b> On Delhi to Mumbai, HDFC on MakeMyTrip excludes Akasa, the cheapest airline. Booked on IndiGo it still lands <span class="num">₹516</span> below the cheapest fare without an offer, so it wins.</div>
+    <div class="call"><b>Show the catch.</b> Axis on Cleartrip saves <span class="num">₹932</span>, but only on Tuesday bookings. It sits under “Save more if you can wait”, with the condition in plain view.</div>
+    <ul>
+      <li><b>Be honest about certainty.</b> Every pick says “Will apply”, “Likely to apply” or “Depends on you”. When I can’t check a monthly limit, I say so.</li>
+      <li><b>Flag poor deals.</b> An <span class="num">₹800</span> discount on a ticket that still costs more than the cheapest fare is labelled “Not worth it”.</li>
+    </ul>
+  </div>
+  <div class="figs">
+    <figure><img src="catch.png" alt="Save more if you can wait: Axis Atlas on Cleartrip, ₹932, Tuesday bookings only"><figcaption>The bigger saving gets its own slot, with the catch spelled out.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div>
+    <h2>Make conditions easy to understand</h2>
+    <p>Conditions are where trust is won or lost, so I kept them visible and kept them calm. Rules that are already met fold into one line. Anything that could still block the discount gets its own row, written as what happens to you: “If you’ve used this offer this month, it won’t apply.”</p>
+    <p>The advertised figure appears only when it differs from what you get, for example when a cap cuts 12% down to 9.2%. The full terms stay one tap away for anyone who wants them.</p>
+  </div>
+  <div class="figs">
+    <figure><img src="conditions.png" alt="Savings, price and conditions block: 4 of 5 conditions met, once per card per month can't verify"><figcaption>Four checks confirmed on one line. The one thing I can’t verify is called out.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div>
+    <h2>When no offer works</h2>
+    <p>Sometimes the honest answer is no, and I treat that as a result in its own right. On Bengaluru to Goa every fare sits below every minimum spend. The headline says so, the next step is the cheapest direct fare, and each near miss explains what would have unlocked it, such as booking for two people.</p>
+    <p>I deliberately left out any suggestion to apply for a new card. Saving a few hundred rupees once is not worth the user’s trust.</p>
+  </div>
+  <div class="figs tall">
+    <figure><img src="nooffer.png" alt="No offer state: None of your cards has an offer for this flight, book Akasa Air direct"><figcaption>A clear no, a direct next step, and a tip that turns a miss into a saving.</figcaption></figure>
+  </div>
+</section>
+
+<section class="wide">
+  <div>
+    <h2>A shorter path to the answer</h2>
+    <ul>
+      <li><b>Route first.</b> Pick cities, a date and travellers. The date strip shows the cheapest fare for each day, and a note explains that minimum spends count the whole booking.</li>
+    </ul>
+    <div class="call"><b>Add cards once.</b> People recognise their cards by how they look, so they pick them from a visual grid. No card number, CVV or OTP is ever asked for, and returning users skip this step.</div>
+    <ul><li><b>Show the matching.</b> A three-second sequence links cards to platforms with a progress bar, so the result feels earned.</li></ul>
+    <div class="row3">
+      <figure><img src="route.png" alt="Route screen"><figcaption>Route, date strip with fares, travellers.</figcaption></figure>
+      <figure><img src="cards.png" alt="Card picker"><figcaption>Cards picked by design, collected in a wallet.</figcaption></figure>
+      <figure><img src="matching.png" alt="Matching screen"><figcaption>Matching with progress beside the counts.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div>
+    <h2>Why the interface looks this way</h2>
+    <p>I kept the screen quiet so the recommendation and the saving lead. A serif for headlines, plain text for everything else, copper for labels and gold only for money. That gives a clear order of reading without extra decoration.</p>
+    <div class="call"><b>Recognisable cards.</b> Realistic card artwork, a stacked wallet and a subtle tilt make it obvious which card is meant. Each card in the wallet shows its status for this flight.</div>
+    <ul><li><b>Motion with a purpose.</b> Cards drop into the wallet, lines connect during matching, and the chosen card flies into the booking platform at handoff. Each movement explains a step.</li></ul>
+    <div class="call"><b>Direct recommendation.</b> “Pay with HDFC Regalia on MakeMyTrip.” Price and saving follow, and each fact appears once.</div>
+    <ul><li><b>Accessible by default.</b> Light and dark themes share one set of tokens, all text meets WCAG AA contrast, and reduced-motion settings are respected.</li></ul>
+  </div>
+  <div class="figs">
+    <figure><img src="wallet.png" alt="Your cards for this flight: stacked wallet with status per card"><figcaption>The stacked wallet shows every card’s status for this flight.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div>
+    <h2>Decisions beyond the main flow</h2>
+    <div class="call"><b>No card upsell.</b> Cardpick works with the cards people already own. Recommending new cards would undercut every other answer it gives.</div>
+    <div class="call"><b>Help at handoff.</b> A “Remember to pay with” screen restates the card, code, minimum and anything to watch, with a copy option, because people lose context the moment they land on another site.</div>
+    <ul><li><b>Recover from expired offers.</b> If an offer ends while someone is away, the next-best option takes its place instead of an error.</li></ul>
+    <div class="call"><b>30 Sundays bonus.</b> Only after the user has their answer, a relevant trip idea such as “Bali for two” shows what their card benefits could add up to. It is exclusive to 30 Sundays and never gets in the way of the main task.</div>
+  </div>
+  <div class="figs">
+    <figure class="tall"><img src="handoff.png" alt="Handoff screen: You're heading to MakeMyTrip, remember to pay with HDFC Regalia"><figcaption>Handoff keeps the offer details in hand.</figcaption></figure>
+    <figure><img src="trip.png" alt="Bali for two trip idea, exclusive with 30 Sundays"><figcaption>The trip idea appears after the answer.</figcaption></figure>
+  </div>
+</section>
+
+<section class="nofig">
+  <div>
+    <h2>What I would test next</h2>
+    <ol>
+      <li>Do people trust “Likely to apply” enough to act on it, or do they want to check the monthly limit themselves?</li>
+      <li>Does “Save more if you can wait” lead to better bookings, or does it add doubt at the wrong moment?</li>
+      <li>How do results hold up with live fares and offer feeds? The prototype uses sample data and assumes the same base fare on every platform.</li>
+    </ol>
+  </div>
+</section>
+
+</body>
+</html>
