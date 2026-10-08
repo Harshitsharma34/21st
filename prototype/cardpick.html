@@ -589,7 +589,7 @@ p{margin:0}
 .evt-btn b{background:var(--rec);color:#fff;border-radius:5px;padding:1px 6px;font-size:11px;font-variant-numeric:tabular-nums}
 body.has-dock .screen{padding-bottom:190px}
 
-.evt{position:fixed;right:12px;top:12px;bottom:12px;width:min(360px,calc(100vw - 24px));z-index:71;background:var(--surface);border:1px solid var(--border);border-radius:16px;display:flex;flex-direction:column;opacity:0;visibility:hidden;transform:translateY(12px) scale(.98);transform-origin:100% 100%;transition:opacity .2s,transform .3s var(--ease),visibility 0s .3s;box-shadow:0 30px 60px -30px rgba(0,0,0,.4)}
+.evt{position:fixed;right:12px;top:auto;bottom:12px;max-height:calc(100% - 24px);overflow:auto;width:min(360px,calc(100vw - 24px));z-index:71;background:var(--surface);border:1px solid var(--border);border-radius:16px;display:flex;flex-direction:column;opacity:0;visibility:hidden;transform:translateY(12px) scale(.98);transform-origin:100% 100%;transition:opacity .2s,transform .3s var(--ease),visibility 0s .3s;box-shadow:0 30px 60px -30px rgba(0,0,0,.4)}
 .evt.show{opacity:1;visibility:visible;transform:none;transition:opacity .2s,transform .3s var(--ease)}
 .evt-h{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)}
 .evt-h b{font-size:15px}
@@ -1235,7 +1235,6 @@ body,.rec,.alt,.cd,.btn,.iconbtn,.route-pill{transition:background-color .25s,bo
 <aside class="evt" id="evt" aria-label="Prototype analytics">
   <div class="evt-h"><b>Prototype analytics</b><button class="iconbtn" id="evtClose" type="button" aria-label="Close analytics"><i data-lucide="x" class="i"></i></button></div>
   <div class="evt-funnel" id="evtFunnel"></div>
-  <div class="evt-list" id="evtList"></div>
   <div class="evt-demo">
     <button class="btn ghost sm" type="button" data-action="demo-restart">Restart at ad</button>
     <button class="btn ghost sm" type="button" data-action="demo-expire">Simulate expired offer</button>
@@ -1469,7 +1468,7 @@ function renderEvents(){
   document.getElementById("evtCount").textContent = events.length;
   document.getElementById("evtFunnel").innerHTML = FUNNEL.map(([l,a,b]) =>
     `<div><span>${l}</span><span class="${has(a)&&has(b)?"ok":""}">${has(a) ? (has(b) ? "converted" : "open") : "not reached"}</span></div>`).join("");
-  document.getElementById("evtList").innerHTML = events.slice().reverse().map(e =>
+  if (document.getElementById("evtList")) document.getElementById("evtList").innerHTML = events.slice().reverse().map(e =>
     `<div><span class="n">${e.name}</span><span class="p">${e.t.toLocaleTimeString("en-GB")} ${Object.keys(e.props).length ? JSON.stringify(e.props) : ""}</span></div>`).join("");
 }
 
