@@ -2,7 +2,7 @@
 <meta name="description" content="Which card to pay with, on which platform, for your flight, and what you will actually save.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=Pacifico&family=Permanent+Marker&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=Pacifico&display=swap">
 <style>
 /* Layout: mobile-first single column (390px target); desktop home becomes an asymmetric 1fr / 360px split with the wallet as a side rail. */
 :root{
@@ -1050,30 +1050,13 @@ main.screen[data-screen="home"]::after,main.screen[data-screen="detail"]::after,
 .ad-tag b{color:var(--ink);font-weight:600}
 .ad-tag small{color:var(--ink-2);font-size:12px;white-space:nowrap}
 @media (max-width:420px){ .ad-tag small{display:none} }
-/* handoff graffiti: spray-paint flight path, card flies along it into the platform */
-.graf{position:relative;width:320px;height:130px;margin:4px auto 0}
-.graf svg{position:absolute;inset:0;overflow:visible}
-.graf path{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:grafDraw 1s .15s cubic-bezier(.45,0,.25,1) forwards}
-.graf-under{stroke:rgba(204,145,102,.28);stroke-width:12;filter:blur(3px)}
-.graf-line{stroke:var(--rec);stroke-width:4.5}
-.graf-hi{stroke:rgba(255,240,204,.85);stroke-width:1.2;transform:translate(-1px,-1.5px)}
-@keyframes grafDraw{to{stroke-dashoffset:0}}
-.graf-dots circle{fill:var(--rec);opacity:0;transform-box:fill-box;transform-origin:center;animation:grafDot .35s 1.05s var(--spring) forwards}
-.graf-dots circle:nth-child(even){fill:#ffe9c4;animation-delay:1.12s}
-@keyframes grafDot{from{opacity:0;transform:scale(0)}to{opacity:.9;transform:scale(1)}}
-.graf-card{position:absolute;left:0;top:0;offset-path:path("M24 100 C 60 40, 96 30, 116 66 C 132 96, 98 108, 92 84 C 86 60, 140 34, 184 52 C 220 66, 240 70, 262 58");offset-rotate:auto;offset-anchor:50% 50%;animation:grafFly 1.05s .15s cubic-bezier(.45,0,.25,1) both;z-index:2}
-.graf-card .cc{--w:78px}
-@keyframes grafFly{0%{offset-distance:0%;transform:scale(1);opacity:1}80%{opacity:1}100%{offset-distance:100%;transform:scale(.35);opacity:0}}
-.graf-ota{position:absolute;left:262px;top:30px;animation:grafOta .5s 1.05s var(--spring) both}
-.graf-ota .ota{--s:54px;box-shadow:0 0 0 4px var(--canvas),0 0 0 5px rgba(204,145,102,.5)}
-@keyframes grafOta{0%{transform:scale(.9)}50%{transform:scale(1.18)}100%{transform:scale(1)}}
+/* handoff content entrance */
 .ho-body{animation:hoIn .5s 1.15s cubic-bezier(.2,.8,.2,1) backwards}
 @keyframes hoIn{from{opacity:0;transform:translateY(14px)}}
 #hoCard{animation:hoFlip .9s 1.3s cubic-bezier(.2,.8,.2,1) backwards}
 @keyframes hoFlip{0%{transform:perspective(1000px) rotateY(-75deg) rotateX(12deg) translateY(30px);opacity:0}65%{transform:perspective(1000px) rotateY(8deg) rotateX(-4deg);opacity:1}100%{transform:none;opacity:1}}
 .ho h1{margin-top:6px}
 .ho-ready{text-transform:none;letter-spacing:0;font-size:13px}
-@media (max-width:360px){ .graf{transform:scale(.88);transform-origin:50% 0} }
 /* 30 Sundays exclusive trip card */
 .trip2{position:relative;display:block;width:100%;min-height:520px;border-radius:var(--r-card);overflow:hidden;text-align:left;color:#fff;border:1px solid var(--border);isolation:isolate}
 .trip2 .scene{transition:transform 1.2s var(--ease)}
@@ -1114,20 +1097,10 @@ main.screen[data-screen="landing"]::after{content:"";position:absolute;left:0;ri
   background-image:radial-gradient(rgba(255,255,255,.075) 1px, transparent 1.3px);background-size:22px 22px;
   -webkit-mask-image:radial-gradient(70% 60% at 70% 30%,#000 0%,rgba(0,0,0,.4) 55%,transparent 85%);mask-image:radial-gradient(70% 60% at 70% 30%,#000 0%,rgba(0,0,0,.4) 55%,transparent 85%)}
 
-/* handoff: card flies into the logo, the intro rises and fades, then a graffiti tag is sprayed onto the card */
+/* handoff: card flies into the logo, then the intro rises and fades */
 .ho-anim{animation:hoUp .45s 1.05s cubic-bezier(.5,0,.75,0) forwards}
 @keyframes hoUp{to{opacity:0;transform:translateY(-28px);height:0;margin:0}}
 .remember{position:relative}
-.graffiti{position:absolute;right:2%;top:-14px;z-index:4;pointer-events:none;transform-origin:20% 60%;animation:gPop .6s 2.15s var(--spring) both}
-.g-tag{display:block;font-family:"Permanent Marker","Marker Felt","Comic Sans MS",cursive;font-size:36px;line-height:1;color:var(--rec);transform:rotate(-9deg);letter-spacing:.01em;
-  text-shadow:0 0 1px #ffe9c4,1px 1px 0 rgba(255,233,196,.55),0 0 14px rgba(204,145,102,.55),0 0 26px rgba(204,145,102,.25)}
-.g-drip{position:absolute;left:38%;top:30px;width:3px;height:0;border-radius:0 0 3px 3px;background:var(--rec);animation:gDrip .9s 2.6s ease-out forwards}
-.graffiti i{position:absolute;left:0;top:0;width:var(--s);height:var(--s);border-radius:50%;background:var(--rec);transform:translate(var(--x),var(--y)) scale(0);opacity:.85;animation:gDot .4s 2.3s var(--spring) forwards}
-.graffiti i:nth-of-type(even){background:#ffe9c4;opacity:.7;animation-delay:2.38s}
-@keyframes gPop{0%{opacity:0;transform:scale(.2) rotate(-18deg)}60%{opacity:1;transform:scale(1.18) rotate(4deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
-@keyframes gDrip{to{height:16px}}
-@keyframes gDot{to{transform:translate(var(--x),var(--y)) scale(1)}}
-@media (max-width:420px){ .g-tag{font-size:31px} .graffiti{top:-22px;right:7%} }
 </style>
 
 <div id="app" aria-live="polite"></div>
@@ -2098,11 +2071,6 @@ SCREENS.handoff = {
         <div class="label" style="margin-top:26px">Remember to pay with</div>
         <div class="remember">
           <div class="tiltw sway" data-tilt id="hoCard">${cardHTML(o.card)}</div>
-          <div class="graffiti" aria-hidden="true">
-            <span class="g-tag">${inr(e.saving)} off!</span>
-            <span class="g-drip"></span>
-            <i style="--x:-14px;--y:-10px;--s:7px"></i><i style="--x:8px;--y:-18px;--s:4px"></i><i style="--x:118px;--y:2px;--s:6px"></i><i style="--x:128px;--y:34px;--s:4px"></i><i style="--x:-6px;--y:40px;--s:3px"></i><i style="--x:96px;--y:-14px;--s:3px"></i>
-          </div>
           <div class="remember-box">
             <div class="label">Your offer</div>
             <div class="v">Save about ${inr(e.saving)}</div>
