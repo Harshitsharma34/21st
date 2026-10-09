@@ -6,6 +6,7 @@ import { MapStage } from "./map-stage"
 import { CompareBoard, DestinationSheet, LeaveNote } from "./journal"
 import { PortraitMark, Sticker } from "./portraits"
 
+const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
 const TRIPS: TripType[] = ["mountains", "adventure", "relax", "food", "nightlife", "romantic", "family", "spiritual", "nature", "roadtrip"]
 const TOLERANCES: CrowdTolerance[] = ["quiet", "balanced", "festive"]
 const MODES: MapMode[] = ["worth", "crowd", "hype", "hotels", "traffic"]
@@ -99,10 +100,8 @@ export function AppShell({ initial }: { initial: Board }) {
     setOverlay(null)
   }
 
-  const scrubIndex = Math.max(0, days.findIndex((day) => day.start === (board.horizons.find((item) => item.id === horizonId)?.start ?? "")))
-
   return (
-    <div className="app">
+    <div className={`app ${selected ? "has-place" : ""}`}>
       <MapStage board={board} horizonId={horizonId} mode={mode} selectedId={selectedId} onSelect={choose} />
       <a className="brand" href="/" aria-label="beat the hype home">
         <Hand />
@@ -124,6 +123,7 @@ export function AppShell({ initial }: { initial: Board }) {
         ) : null}
         <button type="button" className="text-button" onClick={() => setOverlay("reel")}>drop a reel</button>
       </form>
+      {!selected && panel === "explore" && overlay === null ? <p className="map-note">the hills, four days before the rush.</p> : null}
       <div className="modes map-ui" role="tablist" aria-label="map mode">
         {MODES.map((item) => (
           <button key={item} type="button" role="tab" aria-selected={mode === item} className={mode === item ? "is-on" : ""} onClick={() => setMode(item)}>{item === "worth" ? "worth it" : item}</button>
@@ -189,33 +189,32 @@ export function AppShell({ initial }: { initial: Board }) {
         />
       ) : null}
       <div className="timebar map-ui">
-        <div className="modes-mobile">
-          {MODES.map((item) => (
-            <button key={item} type="button" className={mode === item ? "is-on" : ""} onClick={() => setMode(item)}>{item === "worth" ? "worth it" : item}</button>
-          ))}
-        </div>
         <div className="chips">
           {board.horizons.filter((horizon) => ["now", "weekend", "next-weekend", "30d", "90d"].includes(horizon.id)).map((horizon) => (
-            <button key={horizon.id} type="button" className={horizonId === horizon.id ? "is-on" : ""} onClick={() => setHorizonId(horizon.id)}>{horizon.label}</button>
+            <button key={horizon.id} type="button" className={horizonId === horizon.id ? "is-on" : ""} onClick={() => setHorizonId(horizon.id)}>{horizon.short}</button>
           ))}
         </div>
-        <label className="scrub">
-          <span>drag the days</span>
-          <input
-            type="range"
-            min={0}
-            max={Math.max(0, days.length - 1)}
-            value={scrubIndex}
-            aria-valuetext={days[scrubIndex]?.label ?? ""}
-            onChange={(event) => {
-              const day = days[Number(event.target.value)]
-              if (!day) return
-              const named = board.horizons.find((horizon) => ["now", "weekend", "next-weekend"].includes(horizon.id) && horizon.start === day.start)
-              setHorizonId(named?.id ?? day.id)
-            }}
-          />
-          <span className="scrub-read">{days[scrubIndex]?.label ?? ""}</span>
-        </label>
+        <div className="film" role="listbox" aria-label="days">
+          {days.filter((day, index, list) => list.findIndex((item) => item.start === day.start) === index).slice(0, 9).map((day) => {
+            const active = day.start === (board.horizons.find((item) => item.id === horizonId)?.start ?? "")
+            return (
+              <button
+                key={day.id}
+                type="button"
+                role="option"
+                aria-selected={active}
+                className={active ? "is-on" : ""}
+                onClick={() => {
+                  const named = board.horizons.find((horizon) => ["now", "weekend", "next-weekend"].includes(horizon.id) && horizon.start === day.start)
+                  setHorizonId(named?.id ?? day.id)
+                }}
+              >
+                <span>{day.start.slice(8)}</span>
+                <em>{day.id === "now" ? "now" : MONTHS[Number(day.start.slice(5, 7)) - 1]}</em>
+              </button>
+            )
+          })}
+        </div>
       </div>
       <nav className="dock" aria-label="primary">
         {(["explore", "beat", "trips", "profile"] as const).map((item) => (

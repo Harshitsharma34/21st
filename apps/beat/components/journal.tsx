@@ -22,20 +22,30 @@ export function Ripple({ forecast }: { forecast: Forecast }) {
     ["traffic", forecast.signals.traffic],
   ] as const
   return (
-    <div className="ripple">
-      <div className="ripple-core">the wave</div>
-      {rows.map(([label, signal], index) => {
-        const strength = signal.available ? Math.min(1, Math.abs(signal.velocity ?? 1) / 2.4) : 0.12
+    <div className="ripple" aria-hidden="true">
+      {rows.map(([label, signal]) => {
+        const strength = signal.available ? Math.min(1, Math.abs(signal.velocity ?? 1) / 2.4) : 0.15
         return (
-          <div key={label} className="ripple-row">
+          <div key={label} className={signal.available ? "ripple-cell" : "ripple-cell is-miss"}>
+            <svg viewBox="0 0 72 72">
+              <path className="track" d={arc(36, 40, 22, 300)} />
+              <path className="live" d={arc(36, 40, 22, 28 + strength * 270)} />
+            </svg>
             <span>{label}</span>
-            <span className="ink" style={{ ["--ink" as string]: strength, animationDelay: `${index * 0.15}s` }} />
             <em>{signal.available ? signal.display : "missing"}</em>
           </div>
         )
       })}
     </div>
   )
+}
+
+function arc(cx: number, cy: number, radius: number, degrees: number): string {
+  const sweep = Math.min(330, degrees) * (Math.PI / 180)
+  const x = cx + radius * Math.sin(sweep)
+  const y = cy - radius * Math.cos(sweep)
+  const large = degrees > 180 ? 1 : 0
+  return `M ${cx} ${cy - radius} A ${radius} ${radius} 0 ${large} 1 ${x.toFixed(2)} ${y.toFixed(2)}`
 }
 
 export function DestinationSheet({
@@ -69,24 +79,26 @@ export function DestinationSheet({
           <h2>{place.name}</h2>
           <p className="lifecycle">{forecast.lifecycle.toLowerCase()}</p>
         </div>
-        <button type="button" className="text-button" onClick={onClose}>close</button>
+        <div className="sheet-score">
+          <button type="button" className="text-button" onClick={onClose}>close</button>
+          <div className="worth-card">
+            <span>worth it</span>
+            <strong>{forecast.worthIt.value.toFixed(1)}</strong>
+            <em>{forecast.verdict.toLowerCase()}</em>
+          </div>
+        </div>
       </header>
-      <p className="worth-label">worth it</p>
-      <p className="worth-figure">{forecast.worthIt.value.toFixed(1)}</p>
-      <p className={`verdict ${forecast.verdict === "SKIP" ? "is-skip" : ""}`}>{forecast.verdict.toLowerCase()}</p>
       <p className="editorial">{forecast.line}</p>
       <p className="sub">{forecast.subline}</p>
       <p className="prob">
         {Math.round(forecast.probabilityHighPressure.value * 100)}% chance of an unusually heavy weekend.
         <span className="demo-tag">{forecast.crowd.type.toLowerCase()}</span>
       </p>
-      <section className="journal-list">
-        <h3>this weekend</h3>
-        <Row label="crowd" value={`${forecast.crowd.value.toFixed(1)} / 10`} note="estimated" />
-        <Row label="hotels" value={forecast.signals.booking.pressure == null ? "—" : `${forecast.signals.booking.pressure} pressure`} note={forecast.signals.booking.display} />
-        <Row label="hype" value={`${forecast.hype.value} ${forecast.direction === "up" ? "↑" : forecast.direction === "down" ? "↓" : "→"}`} note={forecast.lifecycle.toLowerCase()} />
-        <Row label="traffic" value={forecast.signals.traffic.display} note={forecast.drivers.find((driver) => driver.id === "traffic")?.level ?? ""} />
-        <Row label="weather" value={forecast.signals.weather.display} note="" />
+      <section className="metrics" aria-label="this weekend">
+        <p><span>crowd</span><strong>{forecast.crowd.value.toFixed(1)}</strong><em>estimated</em></p>
+        <p><span>hype</span><strong>{forecast.hype.value} {forecast.direction === "up" ? "↑" : forecast.direction === "down" ? "↓" : "→"}</strong><em>{forecast.lifecycle.toLowerCase()}</em></p>
+        <p><span>hotels</span><strong>{forecast.signals.booking.pressure == null ? "—" : forecast.signals.booking.pressure}</strong><em>{forecast.signals.booking.display}</em></p>
+        <p className="is-prose"><span>weather</span><strong>{forecast.signals.weather.display}</strong><em>{forecast.signals.traffic.display}</em></p>
       </section>
       <section>
         <h3>why we think this</h3>
@@ -151,16 +163,6 @@ function priceGap(base: number, other: number): string {
   if (pct > 0) return `~${pct}% cheaper`
   if (pct < 0) return `~${Math.abs(pct)}% more`
   return "similar rates"
-}
-
-function Row({ label, value, note }: { label: string; value: string; note: string }) {
-  return (
-    <p>
-      <span>{label}</span>
-      <strong>{value}</strong>
-      {note ? <em>{note}</em> : null}
-    </p>
-  )
 }
 
 export function CompareBoard({
